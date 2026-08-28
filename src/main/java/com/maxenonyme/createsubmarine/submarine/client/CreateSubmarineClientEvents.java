@@ -23,7 +23,8 @@ public class CreateSubmarineClientEvents {
     public static void onTooltip(ItemTooltipEvent event) {
         if (event.getEntity() == null)
             return;
-        if (!GogglesItem.isWearingGoggles(Minecraft.getInstance().player))
+        if (!(event.getEntity() instanceof Player player) || !GogglesItem.isWearingGoggles(player))
+            return;
             return;
 
         if (event.getItemStack().getItem() instanceof BlockItem blockItem) {

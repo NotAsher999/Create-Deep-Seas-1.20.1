@@ -21,7 +21,9 @@ The tracked-source ZIP is a `git archive` and cannot build by itself because the
 five local build/runtime inputs are deliberately ignored. The minimal workspace
 contains those hash-locked inputs, a verified Git bundle with the port branch
 and annotated tag, cross-platform ZIP paths, recovery instructions and a
-manifest covering every file.
+manifest covering every file. Before publishing the ZIP, the script also clones
+that bundle into an isolated probe, restores all five dependencies, rechecks
+their hashes and requires the restored tagged worktree to remain clean.
 
 Publication uses an isolated staging directory. A failed build or validation
 does not replace the previous versioned release or `dist` JAR; final publication

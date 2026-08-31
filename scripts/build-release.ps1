@@ -90,12 +90,15 @@ function Assert-LocalInputs {
 }
 
 function Invoke-GitText {
-    param([Parameter(Mandatory = $true)][string[]]$Arguments)
+    param(
+        [Parameter(Mandatory = $true)][string[]]$Arguments,
+        [string]$WorkingDirectory = $projectDir
+    )
 
     $oldPreference = $ErrorActionPreference
     try {
         $ErrorActionPreference = 'Continue'
-        $output = & git.exe -C $projectDir @Arguments 2>&1
+        $output = & git.exe -C $WorkingDirectory @Arguments 2>&1
         $exitCode = $LASTEXITCODE
     }
     finally { $ErrorActionPreference = $oldPreference }
@@ -515,7 +518,8 @@ try {
         '',
         '```powershell',
         "git clone -b $expectedBranch '.\.checkpoint\$bundleName' restored-repository",
-        'Set-Location restored-repository'
+        'Set-Location restored-repository',
+        "New-Item -ItemType Directory -Path '.\localDeps' -Force | Out-Null"
     )
     $restoreLines += $copyLines
     $restoreLines += @(
@@ -527,6 +531,43 @@ try {
         'The build-input manifest stays in the parent minimal workspace for independent verification.'
     )
     $restoreLines | Set-Content -LiteralPath (Join-Path $workspaceStage 'RESTORE.md') -Encoding UTF8
+
+    # Exercise the documented bundle recovery path before publishing the workspace ZIP.
+    # A Git clone does not materialize the ignored localDeps directory, so this probe
+    # also guards the directory-creation step in RESTORE.md.
+    $restoreProbe = Assert-StrictChildPath `
+        -Path (Join-Path $stagingRoot 'restore-probe') -ParentPath $stagingRoot
+    if (Test-Path -LiteralPath $restoreProbe) {
+        Remove-Item -LiteralPath $restoreProbe -Recurse -Force
+    }
+    try {
+        Invoke-GitText -WorkingDirectory $stagingRoot -Arguments @(
+            'clone', '-b', $expectedBranch, $bundlePath, $restoreProbe) | Out-Null
+        [System.IO.Directory]::CreateDirectory((Join-Path $restoreProbe 'localDeps')) | Out-Null
+        foreach ($entry in $requiredLocalFiles.GetEnumerator()) {
+            $probeDependency = Join-Path $restoreProbe $entry.Key
+            Copy-Item -LiteralPath (Join-Path $workspaceStage $entry.Key) `
+                -Destination $probeDependency -Force
+            Assert-FileHash -Path $probeDependency -ExpectedSha256 $entry.Value `
+                -Description "restored $($entry.Key)"
+        }
+        $probeHead = Invoke-GitText -WorkingDirectory $restoreProbe -Arguments @('rev-parse', 'HEAD')
+        $probeTagType = Invoke-GitText -WorkingDirectory $restoreProbe -Arguments @(
+            'cat-file', '-t', "refs/tags/$tagName")
+        $probeTagCommit = Invoke-GitText -WorkingDirectory $restoreProbe -Arguments @(
+            'rev-parse', '--verify', "refs/tags/$tagName^{commit}")
+        $probeStatus = Invoke-GitText -WorkingDirectory $restoreProbe -Arguments @(
+            'status', '--porcelain=v1', '--untracked-files=all')
+        if ($probeHead -ne $headCommit -or $probeTagType -ne 'tag' -or
+            $probeTagCommit -ne $headCommit -or -not [string]::IsNullOrWhiteSpace($probeStatus)) {
+            throw 'Restored bundle probe did not reproduce the clean tagged checkpoint.'
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $restoreProbe) {
+            Remove-Item -LiteralPath $restoreProbe -Recurse -Force
+        }
+    }
 
     $workspaceManifest = Join-Path $workspaceStage 'WORKSPACE_MANIFEST_SHA256.txt'
     Write-DirectoryManifest -Root $workspaceStage -ManifestPath $workspaceManifest

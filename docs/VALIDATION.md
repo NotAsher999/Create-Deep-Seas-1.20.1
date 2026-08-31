@@ -112,6 +112,16 @@ formal 1.20.1 Sable port. Its HEAD/TAIL injections now use
 `CallbackInfoReturnable<Integer>` instead of `CallbackInfo`; this matches Mixin
 semantics and removes the downstream uninitialized-render-data failure.
 
+## Packaging defect found and closed
+
+An initial packaging rehearsal from checkpoint `39e1eed` was rejected during
+independent recovery testing: a bundle clone correctly omitted the ignored
+`localDeps` directory, while the generated instructions tried to copy the five
+locked JARs into that directory before creating it. The release script now
+creates the directory explicitly and, before publication, performs the same
+bundle clone, dependency copy/hash verification, annotated-tag check and clean
+worktree check described by `RESTORE.md`.
+
 ## Acceptance boundary
 
 The recorded production run proves startup, world entry, Sable sublevel

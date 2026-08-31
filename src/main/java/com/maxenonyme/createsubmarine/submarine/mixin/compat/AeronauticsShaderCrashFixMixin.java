@@ -1,11 +1,12 @@
 package com.maxenonyme.createsubmarine.submarine.mixin.compat;
 
+import dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager", remap = false)
+@Mixin(value = LevititeShaderManager.class, remap = false)
 public class AeronauticsShaderCrashFixMixin {
 
     @Inject(method = "isEnabled", at = @At("HEAD"), cancellable = true, remap = false)

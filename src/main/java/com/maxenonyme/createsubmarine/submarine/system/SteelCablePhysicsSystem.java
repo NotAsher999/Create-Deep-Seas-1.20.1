@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
@@ -28,7 +28,9 @@ import java.util.UUID;
 
 public class SteelCablePhysicsSystem {
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         for (Player player : event.getServer().getPlayerList().getPlayers()) {
             if (player.isSpectator())
                 continue;
@@ -260,7 +262,7 @@ public class SteelCablePhysicsSystem {
             return new Vector3d(a);
         }
         double t = ap.dot(ab) / abLenSq;
-        t = Math.clamp(t, 0.0, 1.0);
+        t = net.minecraft.util.Mth.clamp(t, 0.0, 1.0);
         return new Vector3d(a).add(ab.mul(t));
     }
 

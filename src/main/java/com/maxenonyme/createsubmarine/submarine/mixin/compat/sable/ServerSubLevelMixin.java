@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerSubLevel.class)
+@Mixin(value = ServerSubLevel.class, remap = false)
 public class ServerSubLevelMixin {
 
-    @Inject(method = "setSplitFrom", at = @At("HEAD"))
+    @Inject(method = "setSplitFrom", at = @At("HEAD"), remap = false)
     private void createsubmarine$inheritMineOwnership(ServerSubLevel containingSubLevel, Pose3d originalPose, CallbackInfo ci) {
         MineOwnershipRegistry.onSplit(((ServerSubLevel) (Object) this).getUniqueId(), containingSubLevel.getUniqueId());
     }

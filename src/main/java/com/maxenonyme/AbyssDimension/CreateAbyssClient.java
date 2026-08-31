@@ -4,10 +4,10 @@ import com.maxenonyme.AbyssDimension.client.PDAManager;
 import com.maxenonyme.AbyssDimension.entities.EntityRegistry;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 public final class CreateAbyssClient {
     private CreateAbyssClient() {
@@ -19,8 +19,8 @@ public final class CreateAbyssClient {
         modEventBus.addListener(CreateAbyssClient::onRegisterLayers);
         modEventBus.register(PDAManager.ModEvents.class);
 
-        NeoForge.EVENT_BUS.register(PDAManager.GameEvents.class);
-        NeoForge.EVENT_BUS.register(com.maxenonyme.AbyssDimension.client.CookiecutterClientHandler.class);
+        MinecraftForge.EVENT_BUS.register(PDAManager.GameEvents.class);
+        MinecraftForge.EVENT_BUS.register(com.maxenonyme.AbyssDimension.client.CookiecutterClientHandler.class);
     }
 
     private static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {

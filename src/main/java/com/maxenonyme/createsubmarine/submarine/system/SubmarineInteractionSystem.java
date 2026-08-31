@@ -10,11 +10,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Vector3d;
 import java.util.Map;
 import java.util.UUID;
 public class SubmarineInteractionSystem {
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> AQUATIC =
+            net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE,
+                    new net.minecraft.resources.ResourceLocation("minecraft", "aquatic"));
     private static final java.util.concurrent.ConcurrentHashMap<UUID, Vector3d> LAST_POSITIONS = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.concurrent.ConcurrentHashMap<UUID, Double> SUB_VELOCITIES = new java.util.concurrent.ConcurrentHashMap<>();
     private static int tickCounter = 0;
@@ -25,7 +28,9 @@ public class SubmarineInteractionSystem {
         tickCounter = 0;
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         tickCounter++;
         Map<UUID, OrientedBoundingBox3d> hulls = SubmarineHullManager.getActiveHulls();
         if (hulls.isEmpty()) {
@@ -63,7 +68,7 @@ public class SubmarineInteractionSystem {
             pos.x + maxDim, pos.y + maxDim, pos.z + maxDim
         );
         for (Entity entity : level.getEntitiesOfClass(Entity.class, searchBox)) {
-            if (entity instanceof WaterAnimal || entity.getType().is(net.minecraft.tags.EntityTypeTags.AQUATIC)) {
+            if (entity instanceof WaterAnimal || entity.getType().is(AQUATIC)) {
                 if (SubmarineHullManager.contains(obb, entity.getX(), entity.getY(), entity.getZ())) {
                     Vec3 center = new Vec3(pos.x, pos.y, pos.z);
                     Vec3 pushDir = entity.position().subtract(center).normalize();

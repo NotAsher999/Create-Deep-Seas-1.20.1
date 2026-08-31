@@ -39,10 +39,12 @@ public class ElectrolyzerBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
-            net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+    public net.minecraft.world.InteractionResult use(BlockState state, Level level, BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.phys.BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ElectrolyzerBlockEntity be) {
-            player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+            net.minecraftforge.network.NetworkHooks.openScreen((net.minecraft.server.level.ServerPlayer) player,
+                    new net.minecraft.world.SimpleMenuProvider(
                     (id, inv, p) -> new com.maxenonyme.createsubmarine.submarine.gui.ElectrolyzerMenu(id, inv, be, be.data),
                     net.minecraft.network.chat.Component.translatable("block.create_submarine.electrolyzer")), pos);
         }

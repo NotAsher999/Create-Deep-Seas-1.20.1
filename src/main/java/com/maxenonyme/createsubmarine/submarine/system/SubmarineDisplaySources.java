@@ -5,17 +5,17 @@ import com.simibubi.create.api.behaviour.display.DisplaySource;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SubmarineDisplaySources {
     public static final DeferredRegister<DisplaySource> DISPLAY_SOURCES = DeferredRegister.create(
-            ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath("create", "display_source")),
+            ResourceKey.createRegistryKey(new ResourceLocation("create", "display_source")),
             CreateSubmarine.MOD_ID
     );
 
-    public static final DeferredHolder<DisplaySource, BarometerDisplaySource> BAROMETER = DISPLAY_SOURCES.register(
+    public static final RegistryObject<BarometerDisplaySource> BAROMETER = DISPLAY_SOURCES.register(
             "barometer",
             BarometerDisplaySource::new
     );

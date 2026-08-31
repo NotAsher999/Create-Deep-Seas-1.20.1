@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,13 +154,13 @@ public class DeepSeasUpdateScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         if (maxScroll > 0) {
             this.scrollAmount -= scrollY * (this.font.lineHeight + 2) * 2;
             this.scrollAmount = Mth.clamp(this.scrollAmount, 0, maxScroll);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return super.mouseScrolled(mouseX, mouseY, scrollY);
     }
 
     @Override

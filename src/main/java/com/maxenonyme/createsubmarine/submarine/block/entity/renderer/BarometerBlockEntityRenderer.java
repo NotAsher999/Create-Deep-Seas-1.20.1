@@ -15,8 +15,8 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.entity.animal.Pufferfish;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 
 public class BarometerBlockEntityRenderer implements BlockEntityRenderer<BarometerBlockEntity> {
@@ -108,13 +108,13 @@ public class BarometerBlockEntityRenderer implements BlockEntityRenderer<Baromet
         
 
 
-        net.neoforged.neoforge.fluids.FluidStack water = new net.neoforged.neoforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
+        net.minecraftforge.fluids.FluidStack water = new net.minecraftforge.fluids.FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000);
         renderForcedFluid(water, 0.01f / 16f, 4.01f / 16f, 0.01f / 16f, 15.99f / 16f, 15.99f / 16f, 15.99f / 16f, ms, buffer, light, overlay);
     }
 
-    private void renderForcedFluid(net.neoforged.neoforge.fluids.FluidStack fluid, float xMin, float yMin, float zMin, float xMax, float yMax, float zMax, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+    private void renderForcedFluid(net.minecraftforge.fluids.FluidStack fluid, float xMin, float yMin, float zMin, float xMax, float yMax, float zMax, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         com.mojang.blaze3d.vertex.VertexConsumer vc = buffer.getBuffer(net.minecraft.client.renderer.RenderType.entityTranslucent(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS));
-        net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions props = net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid.getFluid());
+        net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions props = net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(fluid.getFluid());
         net.minecraft.client.renderer.texture.TextureAtlasSprite sprite = net.minecraft.client.Minecraft.getInstance().getTextureAtlas(net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS).apply(props.getStillTexture(fluid));
         int color = props.getTintColor(fluid);
         int r = (color >> 16) & 0xFF, g = (color >> 8) & 0xFF, b = color & 0xFF, a = (color >> 24) & 0xFF;
@@ -131,9 +131,9 @@ public class BarometerBlockEntityRenderer implements BlockEntityRenderer<Baromet
     }
 
     private void addQuad(com.mojang.blaze3d.vertex.VertexConsumer vc, org.joml.Matrix4f mat, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, float u1, float v1, float u2, float v2, float u3, float v3, float u4, float v4, int r, int g, int b, int a, int light, int overlay, float nx, float ny, float nz) {
-        vc.addVertex(mat, x4, y4, z4).setColor(r, g, b, a).setUv(u4, v4).setOverlay(overlay).setLight(light).setNormal(nx, ny, nz);
-        vc.addVertex(mat, x3, y3, z3).setColor(r, g, b, a).setUv(u3, v3).setOverlay(overlay).setLight(light).setNormal(nx, ny, nz);
-        vc.addVertex(mat, x2, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setOverlay(overlay).setLight(light).setNormal(nx, ny, nz);
-        vc.addVertex(mat, x1, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(nx, ny, nz);
+        vc.vertex(mat, x4, y4, z4).color(r, g, b, a).uv(u4, v4).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        vc.vertex(mat, x3, y3, z3).color(r, g, b, a).uv(u3, v3).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        vc.vertex(mat, x2, y2, z2).color(r, g, b, a).uv(u2, v2).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        vc.vertex(mat, x1, y1, z1).color(r, g, b, a).uv(u1, v1).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
     }
 }

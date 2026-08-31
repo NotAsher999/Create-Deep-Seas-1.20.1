@@ -6,6 +6,7 @@ import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBloc
 import dev.simulated_team.simulated.content.items.rope.RopeItem.RopeItem;
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import dev.simulated_team.simulated.index.SimDataComponents;
+import dev.simulated_team.simulated.compat.components.ItemComponentCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -56,27 +57,27 @@ public class SteelCableItem extends RopeItem {
         boolean validLocation = isValidRopeAttachment(level, clickedPos);
 
         if (player != null && player.isShiftKeyDown()) {
-            heldStack.remove(SimDataComponents.ROPE_FIRST_CONNECTION);
+            ItemComponentCompat.remove(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION);
             return InteractionResult.SUCCESS;
         }
 
         if (validLocation) {
-            if (heldStack.has(SimDataComponents.ROPE_FIRST_CONNECTION)) {
+            if (ItemComponentCompat.has(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION)) {
                 if (!level.isClientSide) {
-                    if (!this.attachSteelCable(level, heldStack.get(SimDataComponents.ROPE_FIRST_CONNECTION), clickedPos)) {
-                        heldStack.remove(SimDataComponents.ROPE_FIRST_CONNECTION);
+                    if (!this.attachSteelCable(level, ItemComponentCompat.get(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION), clickedPos)) {
+                        ItemComponentCompat.remove(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION);
                         return InteractionResult.SUCCESS;
                     } else {
                         SimAdvancements.LEARNING_THE_ROPES.awardTo(player);
                     }
                 }
-                heldStack.remove(SimDataComponents.ROPE_FIRST_CONNECTION);
+                ItemComponentCompat.remove(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION);
                 if (!player.isCreative()) {
                     context.getItemInHand().shrink(1);
                 }
                 return InteractionResult.SUCCESS;
             }
-            heldStack.set(SimDataComponents.ROPE_FIRST_CONNECTION, clickedPos);
+            ItemComponentCompat.set(heldStack, SimDataComponents.ROPE_FIRST_CONNECTION, clickedPos);
             return InteractionResult.SUCCESS;
         }
 

@@ -78,20 +78,20 @@ public class BarometerBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
-            BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
-            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
-            net.minecraft.world.phys.BlockHitResult hitResult) {
+    public net.minecraft.world.InteractionResult use(BlockState state, net.minecraft.world.level.Level level,
+            BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hitResult) {
+        net.minecraft.world.item.ItemStack stack = player.getItemInHand(hand);
         if (stack.is(net.minecraft.world.item.Items.NAME_TAG)
-                && stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
+                && stack.hasCustomHoverName()) {
             if (level.getBlockEntity(pos) instanceof BarometerBlockEntity be) {
-                be.setCustomName(stack.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME));
+                be.setCustomName(stack.getHoverName());
                 if (!player.getAbilities().instabuild) {
                     stack.shrink(1);
                 }
-                return net.minecraft.world.ItemInteractionResult.sidedSuccess(level.isClientSide);
+                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
             }
         }
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        return super.use(state, level, pos, player, hand, hitResult);
     }
 }

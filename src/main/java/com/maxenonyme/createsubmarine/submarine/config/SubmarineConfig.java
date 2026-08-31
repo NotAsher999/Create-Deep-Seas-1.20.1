@@ -1,32 +1,32 @@
 package com.maxenonyme.createsubmarine.submarine.config;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class SubmarineConfig {
-        public static final ModConfigSpec SPEC;
-        public static final ModConfigSpec.BooleanValue DISABLE_IMPLOSION;
-        public static final ModConfigSpec.IntValue OXYGEN_MAX_FILL_BLOCKS;
-        public static final ModConfigSpec.IntValue GLOBAL_MAX_DEPTH_CAP;
-        public static final ModConfigSpec.DoubleValue IMPLOSION_CHANCE_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue MAX_DEPTH_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue BALLAST_FORCE_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue BALLAST_LIFT_PER_TANK;
-        public static final ModConfigSpec.DoubleValue FLOATER_LIFT;
-        public static final ModConfigSpec.DoubleValue BALLAST_VERTICAL_SPEED;
-        public static final ModConfigSpec.DoubleValue BALLAST_TRANSFER_RATE_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue WATER_THRUSTER_POWER_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue SUBMARINE_PROPELLER_POWER_MULTIPLIER;
-        public static final ModConfigSpec.DoubleValue PULLEY_MAX_SLIDE_SPEED;
-        public static final ModConfigSpec.IntValue STEEL_CABLE_MAX_LENGTH;
-        public static final ModConfigSpec.BooleanValue ENABLE_BOAT_WATER_CULLING;
-        public static final ModConfigSpec.BooleanValue ENABLE_DEEPER_OCEANS;
-        public static final ModConfigSpec.IntValue DEEPER_OCEANS_DEPTH;
-        public static final ModConfigSpec.BooleanValue DISABLE_STARTUP_SCREENS;
-        public static ModConfigSpec.BooleanValue WELCOME_SCREEN_SEEN;
-        public static ModConfigSpec.ConfigValue<String> IGNORED_UPDATE_VERSION;
+        public static final ForgeConfigSpec SPEC;
+        public static final ForgeConfigSpec.BooleanValue DISABLE_IMPLOSION;
+        public static final ForgeConfigSpec.IntValue OXYGEN_MAX_FILL_BLOCKS;
+        public static final ForgeConfigSpec.IntValue GLOBAL_MAX_DEPTH_CAP;
+        public static final ForgeConfigSpec.DoubleValue IMPLOSION_CHANCE_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue MAX_DEPTH_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue BALLAST_FORCE_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue BALLAST_LIFT_PER_TANK;
+        public static final ForgeConfigSpec.DoubleValue FLOATER_LIFT;
+        public static final ForgeConfigSpec.DoubleValue BALLAST_VERTICAL_SPEED;
+        public static final ForgeConfigSpec.DoubleValue BALLAST_TRANSFER_RATE_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue WATER_THRUSTER_POWER_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue SUBMARINE_PROPELLER_POWER_MULTIPLIER;
+        public static final ForgeConfigSpec.DoubleValue PULLEY_MAX_SLIDE_SPEED;
+        public static final ForgeConfigSpec.IntValue STEEL_CABLE_MAX_LENGTH;
+        public static final ForgeConfigSpec.BooleanValue ENABLE_BOAT_WATER_CULLING;
+        public static final ForgeConfigSpec.BooleanValue ENABLE_DEEPER_OCEANS;
+        public static final ForgeConfigSpec.IntValue DEEPER_OCEANS_DEPTH;
+        public static final ForgeConfigSpec.BooleanValue DISABLE_STARTUP_SCREENS;
+        public static ForgeConfigSpec.BooleanValue WELCOME_SCREEN_SEEN;
+        public static ForgeConfigSpec.ConfigValue<String> IGNORED_UPDATE_VERSION;
 
         static {
-                ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+                ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
                 builder.push("gameplay");
                 DISABLE_IMPLOSION = builder
@@ -114,7 +114,7 @@ public class SubmarineConfig {
                                 .comment("Disable all Deep Seas startup UI screens (Welcome screen and Update notifications).",
                                                 "Highly recommended to set this to TRUE if you are creating a modpack to avoid annoying your players.")
                                 .define("disableStartupScreens", false);
-                if (!net.neoforged.fml.loading.FMLEnvironment.production) {
+                if (!net.minecraftforge.fml.loading.FMLEnvironment.production) {
                         WELCOME_SCREEN_SEEN = builder
                                         .comment("Internal: set to true once the Deep Seas welcome screen has been acknowledged.",
                                                         "Set back to false to show the welcome screen again on the next main menu.")

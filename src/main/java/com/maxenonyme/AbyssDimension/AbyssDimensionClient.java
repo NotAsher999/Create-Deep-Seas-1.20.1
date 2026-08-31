@@ -3,15 +3,15 @@ package com.maxenonyme.AbyssDimension;
 import com.maxenonyme.AbyssDimension.client.AbyssSpecialEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.client.event.RegisterDimensionSpecialEffectsEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 
 @EventBusSubscriber(modid = "create_abyss", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class AbyssDimensionClient {
-    private static final ResourceLocation ABYSS_DIM = ResourceLocation.fromNamespaceAndPath("create_abyss", "abyss");
+    private static final ResourceLocation ABYSS_DIM = new ResourceLocation("create_abyss", "abyss");
 
     @SubscribeEvent
     public static void onRegisterDimensionEffects(RegisterDimensionSpecialEffectsEvent event) {
@@ -21,7 +21,7 @@ public class AbyssDimensionClient {
         );
     }
 
-    @EventBusSubscriber(modid = "create_abyss", bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = "create_abyss", bus = EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class GameEvents {
 
         @SubscribeEvent

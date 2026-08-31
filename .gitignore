@@ -34,3 +34,7 @@ replay_pid*
 /bin
 /.eclipse
 /sodium_shaders
+/localDeps/
+/logs/
+/dist/
+/release/

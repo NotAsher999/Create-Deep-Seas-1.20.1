@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "W": {
+      "item": "minecraft:light_gray_wool"
+    },
+    "P": {
+      "item": "create_submarine:phycological_membrane"
+    }
+  },
+  "pattern": [
+    "WWW",
+    "WPW",
+    "WWW"
+  ],
+  "result": {
+    "count": 1,
+    "item": "create_submarine:floater",
+    "nbt": {
+      "BlockStateTag": {
+        "color": "light_gray"
+      },
+      "CustomModelData": 9
+    }
+  }
+}

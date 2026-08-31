@@ -1,21 +1,30 @@
 package com.maxenonyme.createsubmarine.submarine.system;
 
+import com.google.gson.JsonObject;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.config.SubmarineConfig;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.neoforged.neoforge.common.conditions.ICondition;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 
-public class ConfigCondition implements ICondition {
-    public static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "config_enabled");
+public final class ConfigCondition implements ICondition {
+    public static final ResourceLocation NAME = new ResourceLocation(CreateSubmarine.MOD_ID, "config_enabled");
+    public static final IConditionSerializer<ConfigCondition> SERIALIZER = new IConditionSerializer<>() {
+        @Override
+        public void write(JsonObject json, ConfigCondition condition) {
+            json.addProperty("config_key", condition.configKey);
+        }
 
-    public static final MapCodec<ConfigCondition> CODEC = RecordCodecBuilder.mapCodec(
-            builder -> builder.group(
-                    Codec.STRING.fieldOf("config_key").forGetter(ConfigCondition::getConfigKey)
-            ).apply(builder, ConfigCondition::new)
-    );
+        @Override
+        public ConfigCondition read(JsonObject json) {
+            return new ConfigCondition(json.get("config_key").getAsString());
+        }
+
+        @Override
+        public ResourceLocation getID() {
+            return NAME;
+        }
+    };
 
     private final String configKey;
 
@@ -28,10 +37,14 @@ public class ConfigCondition implements ICondition {
     }
 
     @Override
+    public ResourceLocation getID() {
+        return NAME;
+    }
+
+    @Override
     public boolean test(IContext context) {
         if (configKey.equalsIgnoreCase("enableAbyssDimension")) {
-            // Abyss still in development: no config switch, dev environment only
-            return !net.neoforged.fml.loading.FMLEnvironment.production;
+            return !net.minecraftforge.fml.loading.FMLEnvironment.production;
         }
         if (!SubmarineConfig.SPEC.isLoaded()) {
             return false;
@@ -40,10 +53,5 @@ public class ConfigCondition implements ICondition {
             return SubmarineConfig.ENABLE_DEEPER_OCEANS.get();
         }
         return false;
-    }
-
-    @Override
-    public MapCodec<? extends ICondition> codec() {
-        return CODEC;
     }
 }

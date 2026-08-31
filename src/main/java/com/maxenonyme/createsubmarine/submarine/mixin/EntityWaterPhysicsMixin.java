@@ -27,7 +27,7 @@ public abstract class EntityWaterPhysicsMixin {
     protected it.unimi.dsi.fastutil.objects.Object2DoubleMap<net.minecraft.tags.TagKey<net.minecraft.world.level.material.Fluid>> fluidHeight;
     @org.spongepowered.asm.mixin.Shadow(remap = false)
     @org.spongepowered.asm.mixin.Final
-    private it.unimi.dsi.fastutil.objects.Object2DoubleMap<net.neoforged.neoforge.fluids.FluidType> forgeFluidTypeHeight;
+    private it.unimi.dsi.fastutil.objects.Object2DoubleMap<net.minecraftforge.fluids.FluidType> forgeFluidTypeHeight;
 
     @Inject(method = "updateInWaterStateAndDoFluidPushing", at = @At("HEAD"), cancellable = true)
     private void createsubmarine$cancelWaterPushing(CallbackInfoReturnable<Boolean> cir) {
@@ -68,9 +68,9 @@ public abstract class EntityWaterPhysicsMixin {
     }
 
     @Inject(method = "getEyeInFluidType", at = @At("HEAD"), cancellable = true, remap = false)
-    private void createsubmarine$getEyeInFluidType(CallbackInfoReturnable<net.neoforged.neoforge.fluids.FluidType> cir) {
+    private void createsubmarine$getEyeInFluidType(CallbackInfoReturnable<net.minecraftforge.fluids.FluidType> cir) {
         if (createsubmarine$isInsideAirtightSub()) {
-            cir.setReturnValue(net.neoforged.neoforge.common.NeoForgeMod.EMPTY_TYPE.value());
+            cir.setReturnValue(net.minecraftforge.common.ForgeMod.EMPTY_TYPE.get());
         }
     }
 

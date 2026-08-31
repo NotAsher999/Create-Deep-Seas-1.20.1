@@ -15,7 +15,6 @@ import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -23,9 +22,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.joml.Vector3d;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -181,21 +180,21 @@ public class OxygeneDiffuserBlockEntity extends BlockEntity implements IHaveGogg
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("OxygenTank", oxygenTank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("OxygenTank", oxygenTank.writeToNBT(new CompoundTag()));
         tag.putInt("ActiveTicks", activeTicks);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        oxygenTank.readFromNBT(registries, tag.getCompound("OxygenTank"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        oxygenTank.readFromNBT(tag.getCompound("OxygenTank"));
         if (tag.contains("ActiveTicks")) {
             activeTicks = tag.getInt("ActiveTicks");
         }

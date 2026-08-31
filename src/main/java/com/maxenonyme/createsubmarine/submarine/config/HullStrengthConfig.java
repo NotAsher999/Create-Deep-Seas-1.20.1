@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -116,7 +116,7 @@ public class HullStrengthConfig {
         try {
             JsonReader reader = new JsonReader(new StringReader(json));
             reader.setLenient(true);
-            root = JsonParser.parseReader(reader).getAsJsonObject();
+            root = new JsonParser().parse(reader).getAsJsonObject();
         } catch (Exception e) {
             backupBadFile();
             configParseFailed = true;
@@ -247,7 +247,7 @@ public class HullStrengthConfig {
     public static void update(String key, int maxWaterDepth, float implosionChance) {
         HullProperty prop = new HullProperty(maxWaterDepth, clamp(implosionChance));
         values.put(key, prop);
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(key));
+        Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(key));
         if (block != null) {
             resolvedCache.put(block, prop);
         }

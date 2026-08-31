@@ -51,11 +51,6 @@ public class ArrestingHookBlockEntityRenderer implements BlockEntityRenderer<Arr
         ms.popPose();
     }
 
-    @Override
-    public net.minecraft.world.phys.AABB getRenderBoundingBox(ArrestingHookBlockEntity be) {
-        return new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(2.0);
-    }
-
     private void advanceArm(ArrestingHookBlockEntity be, BlockState state) {
         long now = System.nanoTime();
         long last = be.clientLastNanos;

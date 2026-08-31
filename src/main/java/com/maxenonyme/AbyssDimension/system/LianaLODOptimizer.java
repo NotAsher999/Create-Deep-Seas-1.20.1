@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Vector3dc;
 import java.util.List;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public final class LianaLODOptimizer {
 
     public static final TagKey<Block> LIANA_LOD_TAG = TagKey.create(
             Registries.BLOCK,
-            ResourceLocation.fromNamespaceAndPath("create_abyss", "liana_lod")
+            new ResourceLocation("create_abyss", "liana_lod")
     );
 
     private static int tickCounter = 0;
@@ -52,7 +52,9 @@ public final class LianaLODOptimizer {
         }
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         if (++tickCounter % 10 != 0) return;
         net.minecraft.server.MinecraftServer server = event.getServer();
         if (server == null) return;

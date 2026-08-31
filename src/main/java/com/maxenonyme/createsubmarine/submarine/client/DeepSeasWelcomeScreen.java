@@ -8,9 +8,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.ConfigScreenHandler;
 
 import java.util.List;
 
@@ -99,8 +99,8 @@ public class DeepSeasWelcomeScreen extends Screen {
 
     private void openConfig() {
         ModList.get().getModContainerById(CreateSubmarine.MOD_ID).ifPresentOrElse(
-                mc -> mc.getCustomExtension(IConfigScreenFactory.class).ifPresentOrElse(
-                        factory -> this.minecraft.setScreen(factory.createScreen(mc, titleScreen)),
+                mc -> mc.getCustomExtension(ConfigScreenHandler.ConfigScreenFactory.class).ifPresentOrElse(
+                        factory -> this.minecraft.setScreen(factory.screenFunction().apply(this.minecraft, titleScreen)),
                         () -> this.minecraft.setScreen(titleScreen)),
                 () -> this.minecraft.setScreen(titleScreen));
     }

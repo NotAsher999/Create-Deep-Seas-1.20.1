@@ -4,7 +4,6 @@ import com.maxenonyme.createsubmarine.submarine.system.CableElectrificationSyste
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBlockEntity;
 import dev.simulated_team.simulated.content.blocks.rope.rope_connector.RopeConnectorBlockEntity;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SmartBlockEntityMixin {
 
     @Inject(method = "write", at = @At("TAIL"))
-    private void createsubmarine$write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    private void createsubmarine$write(CompoundTag tag, boolean clientPacket, CallbackInfo ci) {
         Object self = this;
         if (self instanceof RopeWinchBlockEntity || self instanceof RopeConnectorBlockEntity) {
             CableElectrificationSystem.ElectrifiedEnergyStorage storage = CableElectrificationSystem.WINCH_ENERGY.get(self);
@@ -27,7 +26,7 @@ public abstract class SmartBlockEntityMixin {
     }
 
     @Inject(method = "read", at = @At("TAIL"))
-    private void createsubmarine$read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    private void createsubmarine$read(CompoundTag tag, boolean clientPacket, CallbackInfo ci) {
         Object self = this;
         if (self instanceof RopeWinchBlockEntity || self instanceof RopeConnectorBlockEntity) {
             if (tag.contains("createsubmarine$Energy")) {

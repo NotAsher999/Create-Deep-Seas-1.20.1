@@ -1,22 +1,34 @@
 package com.maxenonyme.createsubmarine.submarine.mixin.compat.copycat;
 
+import com.copycatsplus.copycats.foundation.copycat.ICopycatBlock;
+import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Pseudo
-@Mixin(targets = "com.copycatsplus.copycats.foundation.copycat.ICopycatBlock", remap = false)
-public interface CopycatWrenchMixin {
+@Mixin(WrenchItem.class)
+public abstract class CopycatWrenchMixin {
 
-    @Inject(method = "onWrenched", at = @At("HEAD"), cancellable = true)
-    default void createsubmarine$interceptWrench(BlockState state, UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
+    @Inject(
+            method = "useOn",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/content/equipment/wrench/IWrenchable;onWrenched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;",
+                    remap = false
+            ),
+            cancellable = true
+    )
+    private void createsubmarine$interceptCopycatWrench(UseOnContext context,
+            CallbackInfoReturnable<InteractionResult> cir) {
         net.minecraft.world.level.Level level = context.getLevel();
         net.minecraft.core.BlockPos clickedPos = context.getClickedPos();
+
+        if (!(level.getBlockState(clickedPos).getBlock() instanceof ICopycatBlock)) {
+            return;
+        }
         
         java.util.UUID subId = null;
         net.minecraft.core.BlockPos plotPos = clickedPos;

@@ -14,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -25,11 +24,11 @@ public class ElectrolyzerScreen extends AbstractSimiContainerScreen<Electrolyzer
     private static final int H = 123;
 
     private static final ResourceLocation BG =
-        ResourceLocation.fromNamespaceAndPath("create_submarine", "textures/gui/electrolysator_gui.png");
-    private static final ResourceLocation OFF      = ResourceLocation.fromNamespaceAndPath("create_submarine", "textures/gui/off.png");
-    private static final ResourceLocation OFF_OVER = ResourceLocation.fromNamespaceAndPath("create_submarine", "textures/gui/off_over.png");
-    private static final ResourceLocation ON       = ResourceLocation.fromNamespaceAndPath("create_submarine", "textures/gui/on.png");
-    private static final ResourceLocation ON_OVER  = ResourceLocation.fromNamespaceAndPath("create_submarine", "textures/gui/on_over.png");
+        new ResourceLocation("create_submarine", "textures/gui/electrolysator_gui.png");
+    private static final ResourceLocation OFF      = new ResourceLocation("create_submarine", "textures/gui/off.png");
+    private static final ResourceLocation OFF_OVER = new ResourceLocation("create_submarine", "textures/gui/off_over.png");
+    private static final ResourceLocation ON       = new ResourceLocation("create_submarine", "textures/gui/on.png");
+    private static final ResourceLocation ON_OVER  = new ResourceLocation("create_submarine", "textures/gui/on_over.png");
 
     private static final int BTN_W = 14;
     private static final int BTN_H = 15;
@@ -82,7 +81,7 @@ public class ElectrolyzerScreen extends AbstractSimiContainerScreen<Electrolyzer
         @Override
         public void onPress() {
             if (isOnButton != menu.isMachineEnabled())
-                PacketDistributor.sendToServer(
+                com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToServer(
                     new ElectrolyzerTogglePayload(menu.pos));
         }
 
@@ -140,7 +139,7 @@ public class ElectrolyzerScreen extends AbstractSimiContainerScreen<Electrolyzer
 
         TextureAtlasSprite sprite = Minecraft.getInstance()
             .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-            .apply(ResourceLocation.withDefaultNamespace("block/water_still"));
+            .apply(new ResourceLocation("block/water_still"));
 
         float dU = sprite.getU1() - sprite.getU0();
         float dV = sprite.getV1() - sprite.getV0();

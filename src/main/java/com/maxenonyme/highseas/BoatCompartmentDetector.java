@@ -26,7 +26,7 @@ public class BoatCompartmentDetector {
     private static final int MAX_BLOCKS = 500_000;
 
     private static final Block HULL_CONTROLLER = BuiltInRegistries.BLOCK
-            .get(ResourceLocation.fromNamespaceAndPath("create_submarine", "creative_oxygenator"));
+            .get(new ResourceLocation("create_submarine", "creative_oxygenator"));
 
     public record Component(Set<BlockPos> internal, Set<BlockPos> hull, boolean sealed, BlockPos anchor) {
     }

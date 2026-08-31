@@ -4,7 +4,6 @@ import dev.ryanhcode.sable.api.block.propeller.BlockEntityPropeller;
 import dev.ryanhcode.sable.api.block.propeller.BlockEntitySubLevelPropellerActor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -13,8 +12,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 public class WaterThrusterBlockEntity extends BlockEntity implements BlockEntitySubLevelPropellerActor, BlockEntityPropeller {
     public static final int WATER_CAPACITY = 1000;
@@ -57,16 +56,16 @@ public class WaterThrusterBlockEntity extends BlockEntity implements BlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         CompoundTag tag = pkt.getTag();
-        if (tag != null) loadAdditional(tag, registries);
+        if (tag != null) load(tag);
     }
 
     @Override
@@ -129,7 +128,7 @@ public class WaterThrusterBlockEntity extends BlockEntity implements BlockEntity
         );
 
         if (level.random.nextFloat() < 0.1f) {
-             serverLevel.sendParticles(ParticleTypes.GUST,
+             serverLevel.sendParticles(ParticleTypes.CLOUD,
                 ox, oy, oz,
                 1, 0, 0, 0, 0.2
             );
@@ -137,16 +136,16 @@ public class WaterThrusterBlockEntity extends BlockEntity implements BlockEntity
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("WaterTank", waterTank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("WaterTank", waterTank.writeToNBT(new CompoundTag()));
         tag.putInt("Thrust", thrustMagnitude);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        waterTank.readFromNBT(tag.getCompound("WaterTank"));
         thrustMagnitude = tag.getInt("Thrust");
     }
 }

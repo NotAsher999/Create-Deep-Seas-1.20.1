@@ -24,10 +24,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import com.maxenonyme.createsubmarine.submarine.mixin.FallingBlockEntityInvoker;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.neoforge.network.PacketDistributor;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.companion.math.BoundingBox3ic;
@@ -47,16 +47,16 @@ public class UnderwaterMineBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
+        super.saveAdditional(tag);
         if (this.ownerUUID != null) {
             tag.putUUID("OwnerUUID", this.ownerUUID);
         }
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
         if (tag.hasUUID("OwnerUUID")) {
             this.ownerUUID = tag.getUUID("OwnerUUID");
         }
@@ -292,7 +292,7 @@ public class UnderwaterMineBlockEntity extends BlockEntity {
                 if (intensity > 0.05f) {
                     int ticks = (int) (60.0 * (1.0 - (distance / maxDist)));
                     if (ticks < 10) ticks = 10;
-                    PacketDistributor.sendToPlayer(player,
+                    com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToPlayer(player,
                             new com.maxenonyme.createsubmarine.submarine.network.CameraShakePayload(intensity, ticks));
                 }
             }
@@ -406,7 +406,7 @@ public class UnderwaterMineBlockEntity extends BlockEntity {
         }
 
         if (spawnEntity) {
-            FallingBlockEntity fallingBlock = new FallingBlockEntity(
+            FallingBlockEntity fallingBlock = FallingBlockEntityInvoker.create(
                     parentLevel, worldBlockPos.x, worldBlockPos.y, worldBlockPos.z, state);
             fallingBlock.time = 1;
             fallingBlock.dropItem = false;

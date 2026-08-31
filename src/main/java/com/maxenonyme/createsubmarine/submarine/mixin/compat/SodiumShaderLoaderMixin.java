@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
-@Mixin(targets = "net.caffeinemc.mods.sodium.client.gl.shader.ShaderLoader", remap = false)
+@Mixin(targets = "me.jellysquid.mods.sodium.client.gl.shader.ShaderLoader", remap = false)
 public abstract class SodiumShaderLoaderMixin {
 
     private static final String UNIFORM_BLOCK = "uniform vec2 ScreenSize;\n" +
@@ -23,7 +23,11 @@ public abstract class SodiumShaderLoaderMixin {
             "        if (_csubCloseDepth < 1.0 && _csubFragDepth > _csubCloseDepth && _csubFragDepth < _csubFarDepth) { discard; }\n" +
             "    }\n";
 
-    @Inject(method = "getShaderSource", at = @At("RETURN"), cancellable = true, remap = false)
+    @Inject(
+            method = "getShaderSource(Lnet/minecraft/resources/ResourceLocation;)Ljava/lang/String;",
+            at = @At("RETURN"),
+            cancellable = true,
+            remap = false)
     private static void createsubmarine$injectOcclusion(ResourceLocation location, CallbackInfoReturnable<String> cir) {
         String path = location.getPath();
         if (!path.endsWith(".fsh"))

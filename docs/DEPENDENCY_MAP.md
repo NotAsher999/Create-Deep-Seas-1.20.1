@@ -2,57 +2,62 @@
 
 ## Target runtime
 
-| Dependency | Target | Role |
+| Dependency | Target | Role/source |
 | --- | --- | --- |
 | Minecraft | 1.20.1 | Target game |
-| Forge | 47.4.0 | Target loader |
+| Forge | 47.4.0 | Loader and networking/capability lifecycle |
 | Java | 17 | Compile and runtime toolchain |
-| Create | 6.0.8 | Kinetics, stress, tooltips and Ponder integration |
+| Create | 6.0.8 | Kinetics, stress, items and Ponder integration |
 | Flywheel | 1.0.5 | Block-entity visuals |
-| Veil | 1.0.0.296 | Shader and water-occlusion integration |
-| Sable | 2.0.5-port.1 | Sublevels, physics, plots, forces and water occlusion |
-| Simulated | 1.3.1-port.1 | Rope/winch/connector behavior and rendering |
-| Aeronautics | 1.3.1-port.1 | Propeller blocks, renderer and visual base classes |
 | Ponder | 1.0.91 | Ponder scenes |
-| Registrate | MC1.20-1.3.3 | Create dependency chain |
+| Veil | 1.0.0.296 | Shader and water-occlusion integration |
+| Sable | 2.0.5-port.1 | [Formal Forge port](https://github.com/NotAsher999/sable-1.20.1) |
+| Simulated/Aeronautics | 1.3.1-port.1 | [Formal Forge port](https://github.com/NotAsher999/Simulated-Project-1.20.1) |
 
-The exact formal named-development JARs are taken from the existing Sable and
-Simulated port workspaces. Production game instances must use the matching
-production distributions, never named development JARs.
+## Hash-locked local build inputs
 
-## Optional integrations
+These are named development artifacts. They belong in `localDeps` for building
+the project and must not be installed in a normal game instance.
 
-| Integration | Upstream use | Port state |
+| File | SHA-256 |
+| --- | --- |
+| `sable-forge-1.20.1-2.0.5-port.1-dev.jar` | `0A23C66EF70AB04DAB2DF03BB5150AB6576561F446A7CED709FD819A30D3E216` |
+| `simulated-forge-1.20.1-1.3.1-port.1-dev.jar` | `B9E75E12C3928D6A9F3BD16E5249A0AD74FAB239538F76BAD4DE4A58F9915DB8` |
+| `aeronautics-forge-1.20.1-1.3.1-port.1-dev.jar` | `BD404E06850282D908A73E32030C251284363B182CA93579B3A2241A992245DA` |
+| `Veil-forge-1.20.1-1.0.0.296-dev.jar` | `24717637D0B20B2FDE9A25B7456E05FD8F1035FF37000E7BD095742B7DA41E19` |
+| `oculus-mc1.20.1-1.8.0.jar` | `0945DF0CBA0F62B3901DD80C3268E5311B770ECE78C78037A45DB12AC0425FEF` |
+
+Oculus is a production-format optional runtime input retained in the minimal
+workspace solely to reproduce the validated PJ renderer matrix. The normal
+compile does not require it.
+
+## Optional integration contracts
+
+| Integration | Locked version/hash | Port behavior |
 | --- | --- | --- |
-| Copycats+ | Wrench priority Mixin and copied-material hull strength | Exact Forge 1.20.1 artifact/version audit pending |
-| Lithostitched | Recommended/optional world-generation support and startup notice | Exact Forge 1.20.1 artifact/version audit pending |
-| Fusion | Optional connected-texture assets | Exact Forge 1.20.1 artifact/version audit pending |
-| Embeddium/Oculus | Required by the shared PJ renderer stack | Sodium 1.21 mixins require an API/behavior translation, not a package rename |
+| Copycats+ | 3.0.4 / `7D684E6A829FCACF5AB94D20044CAD0E7EB5376CBE02D77954FC41A2D264511F` | Conditional wrench priority and copied-material hull strength |
+| Embeddium | 0.3.31 / `EED3D1325F2ACC2FD4E69BB495E5CCB91D962126AC5330F0582EBC2A3DAF47FB` | Explicit replacement for upstream Sodium renderer hooks |
+| Oculus | 1.8.0 / hash above | Production PJ shader-stack validation |
+| Lithostitched | optional, unconstrained upstream API | Worldgen modifiers and existing startup recommendation |
+| Fusion | optional, resource-only | Connected-texture override assets |
 
-Offroad belongs to the wider Simulated family test matrix but is not a direct
-Deep Seas compile dependency and will not be made mandatory.
+Gradle dependency verification locks resolved Maven artifacts. The Copycats and
+Embeddium tests additionally verify the exact public bytecode contracts used by
+the conditional Mixins.
 
-## Vertical subsystem map
+## Vertical subsystem closure
 
-| Layer | Upstream components | Required migration closure |
-| --- | --- | --- |
-| Entrypoints | Three `@Mod` classes, common/client event buses | Forge constructors, explicit MOD/GAME bus semantics, production Mixin manifest |
-| Registries | Blocks, items, block entities, fluids, effects, menus, entities, creative tab, force groups, density function and condition codec | Forge 47 registries and lifecycle ordering without dropping IDs |
-| Data/resources | Recipes, tags, models, languages, shaders, dimension/worldgen data, Fusion overrides | 1.20.1 schemas, recipe paths and optional-resource behavior |
-| Sable physics | Ballast/floater forces, propellers, pulley, mines, pressure/sinking, lianas, sublevel persistence | Match formal Sable 2.0.5-port.1 APIs and save lifecycle |
-| Simulated ropes | Cable item, strand physics, winch/connector state and renderers | Match formal Simulated 1.3.1-port.1 fields, NBT and constraint semantics |
-| Create/Aeronautics | Stress, display sources, visualizers, propeller inheritance | Match Create 6.0.8/Flywheel 1.0.5/Aeronautics 1.3.1-port.1 APIs |
-| Capabilities | Fluid and energy storage for machines and rope endpoints | Replace NeoForge block capabilities with Forge `LazyOptional` lifecycle and side rules |
-| Networking | Six submarine payloads and one shark struggle payload | Replace 1.21 payload API with direction-locked Forge `SimpleChannel`; preserve validation and bounds |
-| Client rendering | Water occlusion, fog, cracks, ropes, propellers, overlays, Veil/Sodium fixes | Translate to Forge/Embeddium/Oculus without renderer-mod-specific bypasses |
-| Abyss | Dimension effects, lianas, entities, PDA and shark interaction | Preserve upstream production-disable policy; still compile and validate dev behavior |
-| Persistence | Hull config, client state, plant registry, Sable state, machines and ownership | Save/reload and malformed-data boundaries |
+| Layer | Migrated chain |
+| --- | --- |
+| Entrypoints | Three `@Mod` classes, explicit Forge MOD/GAME buses, manifest Mixin discovery |
+| Registries | Blocks, items, block entities, effects, menus, entities, creative tab, force groups, density function and condition codec |
+| Data/resources | 29 recipes, loot/tags, models, languages, three-mod metadata, shaders and worldgen schemas |
+| Physics | Ballast/floater aggregation, propellers, pulley, mines, pressure/sinking and liana force paths |
+| Ropes | Cable item, strand state, winch/connector behavior, rendering, constraints and NBT |
+| Capabilities | Forge fluid/energy providers with side exposure and `LazyOptional` invalidation |
+| Networking | Seven direction-locked `SimpleChannel` messages and client/server handlers |
+| Rendering | Vanilla/Embeddium routing, Veil shader modifiers, fog/cracks/ropes and water occlusion |
+| Persistence | Machine state, hull config, client state, ownership and Sable sublevel save lifecycle |
 
-## Baseline size
-
-- 174 Java source files
-- 42 Mixin classes
-- 266 main resource files
-- 144 `createsubmarine` Java files
-- 26 `AbyssDimension` Java files
-- 4 `highseas` Java files
+Offroad and unrelated PJ addons are compatibility-matrix participants, not
+direct Deep Seas compile dependencies, and are not made mandatory.

@@ -2,7 +2,6 @@ package com.maxenonyme.createsubmarine.submarine.block;
 
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.block.entity.WaterThrusterBlockEntity;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WaterThrusterBlock extends DirectionalBlock implements EntityBlock {
-    public static final MapCodec<WaterThrusterBlock> CODEC = simpleCodec(WaterThrusterBlock::new);
     private static final Map<Direction, VoxelShape> SHAPES = new HashMap<>();
 
     static {
@@ -85,11 +83,6 @@ public class WaterThrusterBlock extends DirectionalBlock implements EntityBlock 
             default:
                 return shape;
         }
-    }
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
     }
 
     public WaterThrusterBlock(Properties properties) {

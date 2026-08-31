@@ -56,11 +56,6 @@ public class PulleyBlockEntityRenderer implements BlockEntityRenderer<PulleyBloc
         ms.popPose();
     }
 
-    @Override
-    public net.minecraft.world.phys.AABB getRenderBoundingBox(PulleyBlockEntity be) {
-        return new net.minecraft.world.phys.AABB(be.getBlockPos()).inflate(1.0);
-    }
-
     private void advanceWheel(PulleyBlockEntity be) {
         long now = System.nanoTime();
         long last = be.clientLastNanos;

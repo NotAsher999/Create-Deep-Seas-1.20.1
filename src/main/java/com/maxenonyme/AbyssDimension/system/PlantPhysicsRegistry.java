@@ -1,6 +1,5 @@
 package com.maxenonyme.AbyssDimension.system;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -41,14 +40,10 @@ public class PlantPhysicsRegistry extends SavedData {
 
     public static PlantPhysicsRegistry get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
-        return storage.computeIfAbsent(new SavedData.Factory<>(
-                PlantPhysicsRegistry::new,
-                PlantPhysicsRegistry::load,
-                null
-        ), NAME);
+        return storage.computeIfAbsent(PlantPhysicsRegistry::load, PlantPhysicsRegistry::new, NAME);
     }
 
-    public static PlantPhysicsRegistry load(CompoundTag tag, HolderLookup.Provider provider) {
+    public static PlantPhysicsRegistry load(CompoundTag tag) {
         PlantPhysicsRegistry registry = new PlantPhysicsRegistry();
         ListTag list = tag.getList("Segments", Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
@@ -71,7 +66,7 @@ public class PlantPhysicsRegistry extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
+    public CompoundTag save(CompoundTag tag) {
         ListTag list = new ListTag();
         for (SegmentData d : segments.values()) {
             CompoundTag s = new CompoundTag();

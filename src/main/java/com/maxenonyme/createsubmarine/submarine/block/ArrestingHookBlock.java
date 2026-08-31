@@ -1,7 +1,6 @@
 package com.maxenonyme.createsubmarine.submarine.block;
 
 import com.maxenonyme.createsubmarine.submarine.block.entity.ArrestingHookBlockEntity;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class ArrestingHookBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
-    public static final MapCodec<ArrestingHookBlock> CODEC = simpleCodec(ArrestingHookBlock::new);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty CEILING = BooleanProperty.create("ceiling");
@@ -42,11 +40,6 @@ public class ArrestingHookBlock extends HorizontalDirectionalBlock implements En
                 .setValue(POWERED, false)
                 .setValue(CEILING, false)
                 .setValue(WATERLOGGED, false));
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 
     @Override
@@ -68,7 +61,7 @@ public class ArrestingHookBlock extends HorizontalDirectionalBlock implements En
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (!level.isClientSide) {
             boolean signal = level.hasNeighborSignal(pos);
             if (signal != state.getValue(POWERED)) {

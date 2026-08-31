@@ -8,10 +8,9 @@ import dev.ryanhcode.sable.companion.SubLevelAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -39,7 +38,7 @@ public final class SubmarineLifecycleHandler {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
-        PacketDistributor.sendToPlayer(player,
+        com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToPlayer(player,
                 new com.maxenonyme.createsubmarine.submarine.network.HullConfigSyncPayload(
                         com.maxenonyme.createsubmarine.submarine.config.HullStrengthConfig.getValues()));
 
@@ -48,14 +47,14 @@ public final class SubmarineLifecycleHandler {
 
             SubLevelRegistry.PlotBounds bounds = SubLevelRegistry.getBounds(subId);
             if (bounds != null) {
-                PacketDistributor.sendToPlayer(player,
+                com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToPlayer(player,
                         new SubLevelBoundsPayload(subId, bounds.minY(), bounds.maxY()));
             }
 
             Map<BlockPos, Integer> cracks = SubmarinePressureSystem.getAllCracks().get(subId);
             if (cracks == null) continue;
             for (Map.Entry<BlockPos, Integer> c : cracks.entrySet()) {
-                PacketDistributor.sendToPlayer(player,
+                com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToPlayer(player,
                         new SubCrackPayload(subId, c.getKey(), c.getValue(), 0));
             }
         }

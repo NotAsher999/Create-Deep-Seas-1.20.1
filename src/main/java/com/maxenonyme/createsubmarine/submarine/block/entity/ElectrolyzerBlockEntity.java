@@ -3,17 +3,16 @@ package com.maxenonyme.createsubmarine.submarine.block.entity;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.block.ElectrolyzerBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
 
 public class ElectrolyzerBlockEntity extends BlockEntity {
@@ -103,17 +102,17 @@ public class ElectrolyzerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 
     @Override
-    public void onDataPacket(net.minecraft.network.Connection net, net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt, net.minecraft.core.HolderLookup.Provider registries) {
+    public void onDataPacket(net.minecraft.network.Connection net, net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt) {
         CompoundTag tag = pkt.getTag();
         if (tag != null) {
-            loadAdditional(tag, registries);
+            load(tag);
         }
     }
 
@@ -153,19 +152,19 @@ public class ElectrolyzerBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("WaterTank", waterTank.writeToNBT(registries, new CompoundTag()));
-        tag.put("OxygenTank", oxygenTank.writeToNBT(registries, new CompoundTag()));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("WaterTank", waterTank.writeToNBT(new CompoundTag()));
+        tag.put("OxygenTank", oxygenTank.writeToNBT(new CompoundTag()));
         tag.putInt("Energy", energyStorage.getEnergyStored());
         tag.putBoolean("Enabled", isEnabled);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
-        oxygenTank.readFromNBT(registries, tag.getCompound("OxygenTank"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        waterTank.readFromNBT(tag.getCompound("WaterTank"));
+        oxygenTank.readFromNBT(tag.getCompound("OxygenTank"));
         int stored = tag.getInt("Energy");
         energyStorage.extractEnergy(energyStorage.getEnergyStored(), false);
         energyStorage.receiveEnergy(stored, false);

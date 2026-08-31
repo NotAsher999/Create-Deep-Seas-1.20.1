@@ -12,8 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.minecraftforge.fml.ModContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -50,8 +49,8 @@ public class HullStrengthConfigScreen extends Screen {
         this.searchBox.setResponder(this::onSearchChanged);
         this.addRenderableWidget(this.searchBox);
 
-        this.blockList = new BlockList(this.minecraft, leftWidth - 20, this.height - 110, 65, 24);
-        this.blockList.setPosition(10, 65);
+        this.blockList = new BlockList(this.minecraft, leftWidth - 20, this.height, 65, this.height - 45, 24);
+        this.blockList.setLeftPos(10);
         this.addRenderableWidget(this.blockList);
 
         int rightX = leftWidth + 20;
@@ -71,7 +70,7 @@ public class HullStrengthConfigScreen extends Screen {
         this.btnApply.visible = false;
         this.addRenderableWidget(this.btnApply);
 
-        this.addRenderableWidget(Button.builder(Component.translatable("create_submarine.ui.button.global_settings"), btn -> this.minecraft.setScreen(new ConfigurationScreen(this.modContainer, this)))
+        this.addRenderableWidget(Button.builder(Component.translatable("create_submarine.ui.button.global_settings"), btn -> this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this)))
                 .bounds(10, this.height - 30, leftWidth - 20, 20)
                 .build());
 
@@ -97,7 +96,7 @@ public class HullStrengthConfigScreen extends Screen {
 
         for (Map.Entry<String, HullStrengthConfig.HullProperty> entry : this.editedValues.entrySet()) {
             String key = entry.getKey();
-            ResourceLocation id = ResourceLocation.parse(key);
+            ResourceLocation id = new ResourceLocation(key);
             Block block = BuiltInRegistries.BLOCK.get(id);
             if (block != null) {
                 String translatedName = block.getName().getString().toLowerCase();
@@ -149,7 +148,7 @@ public class HullStrengthConfigScreen extends Screen {
                 if (prop != null) changed.put(key, prop);
             }
             if (!changed.isEmpty()) {
-                net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+                com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToServer(
                         new com.maxenonyme.createsubmarine.submarine.network.HullConfigEditPayload(changed));
             }
         } else {
@@ -195,8 +194,8 @@ public class HullStrengthConfigScreen extends Screen {
     }
 
     public class BlockList extends ObjectSelectionList<BlockEntry> {
-        public BlockList(Minecraft mc, int width, int height, int y0, int itemHeight) {
-            super(mc, width, height, y0, itemHeight);
+        public BlockList(Minecraft mc, int width, int height, int y0, int y1, int itemHeight) {
+            super(mc, width, height, y0, y1, itemHeight);
         }
 
         public void clearList() {
@@ -214,7 +213,7 @@ public class HullStrengthConfigScreen extends Screen {
 
         @Override
         protected int getScrollbarPosition() {
-            return this.getX() + this.width - 6;
+            return this.getLeft() + this.width - 6;
         }
     }
 

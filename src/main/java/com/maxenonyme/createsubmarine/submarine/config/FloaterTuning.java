@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +41,7 @@ public class FloaterTuning {
             long mtime = Files.getLastModifiedTime(PATH).toMillis();
             if (mtime == lastMtime) return;
 
-            JsonObject json = JsonParser.parseString(Files.readString(PATH)).getAsJsonObject();
+            JsonObject json = new JsonParser().parse(Files.readString(PATH)).getAsJsonObject();
             if (json.has("lift_per_block")) liftPerBlock = json.get("lift_per_block").getAsDouble();
             if (json.has("vertical_drag")) verticalDrag = json.get("vertical_drag").getAsDouble();
             if (json.has("horizontal_drag")) horizontalDrag = json.get("horizontal_drag").getAsDouble();

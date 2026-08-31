@@ -18,7 +18,7 @@ public class CreativeOxygenatorItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
             tooltipComponents.add(Component.empty());
 
@@ -29,7 +29,7 @@ public class CreativeOxygenatorItem extends BlockItem {
                 Component.translatable("create_submarine.tooltip.keyShift").withStyle(ChatFormatting.GRAY))
                 .withStyle(ChatFormatting.DARK_GRAY));
         }
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
     public static void addTranslatableLines(List<Component> tooltip, String key, ChatFormatting style) {

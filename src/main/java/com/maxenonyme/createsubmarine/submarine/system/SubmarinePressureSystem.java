@@ -17,7 +17,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import java.util.List;
@@ -114,7 +114,9 @@ public class SubmarinePressureSystem {
         return true;
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         if (++tickCounter % TICK_INTERVAL != 0)
             return;
         if (com.maxenonyme.createsubmarine.submarine.config.SubmarineConfig.DISABLE_IMPLOSION.get())
@@ -185,7 +187,7 @@ public class SubmarinePressureSystem {
         int top = Math.min(startY + MAX_WATER_SCAN, level.getMaxBuildHeight());
         net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
                 x >> 4, z >> 4,
-                net.minecraft.world.level.chunk.status.ChunkStatus.FULL, false);
+                net.minecraft.world.level.chunk.ChunkStatus.FULL, false);
         if (chunk == null)
             return Integer.MIN_VALUE;
 
@@ -303,7 +305,7 @@ public class SubmarinePressureSystem {
             return;
         SubCrackPayload payload = new SubCrackPayload(id, plotPos, crackLevel, blockId);
         for (net.minecraft.server.level.ServerPlayer player : sl.players()) {
-            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
+            com.maxenonyme.createsubmarine.submarine.network.SubmarineNetwork.sendToPlayer(player, payload);
         }
     }
 
@@ -324,7 +326,7 @@ public class SubmarinePressureSystem {
         if (be != null) {
             ResourceLocation id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(be.getType());
             if (id != null && id.getPath().contains("copycat")) {
-                net.minecraft.nbt.CompoundTag nbt = be.saveWithFullMetadata(level.registryAccess());
+                net.minecraft.nbt.CompoundTag nbt = be.saveWithFullMetadata();
                 if (nbt.contains("Material")) {
                     BlockState mat = net.minecraft.nbt.NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), nbt.getCompound("Material"));
                     if (mat != null && !mat.isAir()) return mat;
@@ -380,7 +382,7 @@ public class SubmarinePressureSystem {
         return depth >= weakest * 0.80;
     }
 
-    public static void onBlockBroken(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
+    public static void onBlockBroken(net.minecraftforge.event.level.BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof Level level) || level.isClientSide())
             return;
         if (com.maxenonyme.createsubmarine.submarine.config.SubmarineConfig.DISABLE_IMPLOSION.get())

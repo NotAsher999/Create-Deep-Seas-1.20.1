@@ -72,12 +72,12 @@ public class CookiecutterSharkEntity extends WaterAnimal {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_LATCHED, false);
-        builder.define(DATA_TARGET_ID, -1);
-        builder.define(DATA_LATCH_YAW, 0.0F);
-        builder.define(DATA_LATCH_HEIGHT, 0.0F);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_LATCHED, false);
+        this.entityData.define(DATA_TARGET_ID, -1);
+        this.entityData.define(DATA_LATCH_YAW, 0.0F);
+        this.entityData.define(DATA_LATCH_HEIGHT, 0.0F);
     }
 
     @Override

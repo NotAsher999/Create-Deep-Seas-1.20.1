@@ -1,0 +1,16 @@
+#version 150
+#priority 1000
+
+[UNIFORM]
+uniform vec2 ScreenSize;
+uniform sampler2D SableCloseSampler;
+uniform sampler2D SableFarSampler;
+uniform float SableWaterOcclusionEnabled;
+
+[FUNCTION main(0) HEAD]
+if (SableWaterOcclusionEnabled > 0.0) {
+    float closeDepth = texture(SableCloseSampler, gl_FragCoord.xy / ScreenSize).r;
+    float farDepth = texture(SableFarSampler, gl_FragCoord.xy / ScreenSize).r;
+    float waterDepth = gl_FragCoord.z;
+    if (closeDepth < 1.0 && waterDepth > closeDepth && waterDepth < farDepth) { discard; }
+}

@@ -219,4 +219,9 @@ public class ArrestingHookBlockEntity extends BlockEntity implements BlockEntity
         super.setRemoved();
         releaseCollider();
     }
+
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        return new net.minecraft.world.phys.AABB(getBlockPos()).inflate(2.0);
+    }
 }

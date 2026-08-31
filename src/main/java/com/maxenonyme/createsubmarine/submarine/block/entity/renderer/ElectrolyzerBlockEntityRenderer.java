@@ -13,8 +13,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 
 public class ElectrolyzerBlockEntityRenderer implements BlockEntityRenderer<ElectrolyzerBlockEntity> {
@@ -80,6 +80,6 @@ public class ElectrolyzerBlockEntityRenderer implements BlockEntityRenderer<Elec
     }
 
     private void addV(VertexConsumer vc, Matrix4f mat, float x, float y, float z, float u, float v, int r, int g, int b, int a, int light, int overlay, float nx, float ny, float nz) {
-        vc.addVertex(mat, x, y, z).setColor(r, g, b, a).setUv(u, v).setOverlay(overlay).setLight(light).setNormal(nx, ny, nz);
+        vc.vertex(mat, x, y, z).color(r, g, b, a).uv(u, v).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
     }
 }

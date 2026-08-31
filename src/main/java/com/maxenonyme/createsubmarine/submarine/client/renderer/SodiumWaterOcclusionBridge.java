@@ -1,9 +1,6 @@
 package com.maxenonyme.createsubmarine.submarine.client.renderer;
 
-import com.maxenonyme.createsubmarine.submarine.mixin.compat.WaterOcclusionRendererAccessor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.ryanhcode.sable.SableClient;
-import dev.ryanhcode.sable.render.water_occlusion.WaterOcclusionRenderer;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.framebuffer.AdvancedFboTextureAttachment;
 import net.minecraft.client.Minecraft;
@@ -71,9 +68,8 @@ public final class SodiumWaterOcclusionBridge {
         }
 
         try {
-            WaterOcclusionRendererAccessor acc = (WaterOcclusionRendererAccessor) (Object) SableClient.WATER_OCCLUSION_RENDERER;
-            AdvancedFbo close = acc.createsubmarine$getCloseBuffer();
-            AdvancedFbo far = acc.createsubmarine$getFarBuffer();
+            AdvancedFbo close = WaterOcclusionRenderer.INSTANCE.getCloseBuffer();
+            AdvancedFbo far = WaterOcclusionRenderer.INSTANCE.getFarBuffer();
             if (close == null || far == null) {
                 GL20.glUniform1f(u.enabled, 0.0f);
                 setPixelPerfect(false);

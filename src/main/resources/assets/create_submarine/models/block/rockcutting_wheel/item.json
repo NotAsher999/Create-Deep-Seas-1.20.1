@@ -4,7 +4,7 @@
 		"wheel": "create_submarine:block/splinewheel",
 		"base": "create_submarine:block/rockcutting_base"
 	},
-	"loader": "neoforge:obj",
+	"loader": "forge:obj",
 	"flip_v": true,
 	"model": "create_submarine:models/block/rockcutting_wheel/spline_block.obj",
 	"display": {

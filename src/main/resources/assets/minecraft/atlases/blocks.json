@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "create_submarine:gui/sprites/banner",
+      "sprite": "create_submarine:banner"
+    }
+  ]
+}

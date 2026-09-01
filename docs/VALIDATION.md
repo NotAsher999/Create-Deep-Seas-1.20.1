@@ -16,7 +16,7 @@ gameplay branch.
 
 ## Automated validation — 2026-09-01
 
-`gradlew clean build --no-daemon` completed with 16/16 tests in seven suites,
+`gradlew clean build --no-daemon` completed with 17/17 tests in seven suites,
 zero failures, errors or skips. The build also ran `verifyProductionJar` against
 the final `build/libs` reobfuscated artifact.
 
@@ -41,6 +41,8 @@ Coverage includes:
 - the water-occlusion pre-pass remains attached to the third
   `crumblingBufferSource()` call, shifted `AFTER`, which is the Forge 1.20.1
   boundary after block-entity/Flywheel rendering and before translucent terrain.
+- the Deep Seas creative section's `create_submarine:banner` sprite has one
+  block-atlas source, a readable 162-pixel-wide PNG and 18-pixel animation frames.
 
 ## Isolated runtime matrix
 
@@ -114,6 +116,26 @@ test runs: they are not evidence against either the final port.2 metadata or a
 Sable build. Exact-artifact gameplay acceptance is intentionally delegated to
 the user rather than converted into a speculative code workaround.
 
+## Exact port.2 PJ runtime and banner finding — 2026-09-01
+
+The final port.2 JAR, SHA-256
+`814B35EF3AF2E763B3566A8582B5E214860DF542410BBCE3475170FBABF7DBDD`,
+ran in the PJ instance from 12:56 through 13:15. The 1,643-line log has
+SHA-256 `1CA0F73FB5C5FE7827DF2CFCADF67056C2049E3F15A777A0A271454A01FADEE1`.
+Deep Seas selected the Embeddium water-occlusion hooks; Sable initialized the
+server and client sublevel containers; repeated saves completed; Complementary
+Reimagined plus Euphoria Patches loaded; and the client shut down normally.
+There was no Mixin application failure, null-shader exception, GL fatal error or
+new crash report. Flywheel defensively fell back from forced instancing to off
+after the shader pack loaded.
+
+The user then reported that the Deep Seas creative-section title rendered as
+the black and magenta missing-texture checkerboard. Static audit matched that
+observation: the section requested `create_submarine:banner` and its PNG was
+present, but no block-atlas source registered that sprite. This is the runtime
+finding closed by port.3; visual confirmation of its exact artifact remains the
+acceptance gate.
+
 ## Formal packaging retry — 2026-09-01
 
 The first tagged packaging attempt stopped before Gradle ran because the local
@@ -125,13 +147,22 @@ formal run and its generated manifests are the release acceptance gate.
 
 ## Runtime defects found and closed
 
+### Creative section banner atlas
+
+The exact port.2 PJ run rendered the Deep Seas section title as the black and
+magenta missing-texture checkerboard. The section JSON and animated PNG matched
+upstream, but neither upstream nor the port contributed the required
+`minecraft:blocks` atlas source for `create_submarine:banner`. Port.3 adds one
+addon-owned `single` source and locks the complete section-to-atlas-to-PNG
+contract without modifying Simulated or copying another addon's resources.
+
 ### Sable force-group verifier
 
 Sable previously assumed the registry contained exactly its seven built-ins,
 which rejected legitimate addon entries. The formal Sable workspace now verifies
 all built-ins by identity while allowing additional registered force groups.
 Sable's clean build passed 51/51 tests in 24 suites; its production JAR hash is
-`6AFA08BE8FCFFFEDDEF6A955CBD7214C245F4DA72F7DA3AA7C1619F78A573D45`.
+`F139545B947E3E429BDD5BB3D08AD3C8B42A78266AF25DA13C19813AD6F9C042`.
 
 ### Production Mixin refmap
 

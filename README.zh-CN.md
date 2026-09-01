@@ -45,7 +45,7 @@ Embeddium、Copycats+Embeddium 客户端组合以及基础/Copycats 专服启动
 .\gradlew.bat clean build --no-daemon
 ```
 
-提交并建立 annotated tag `v2.2.3-port.2` 后，运行 `build-release.bat` 可生成
+提交并建立 annotated tag `v2.2.3-port.3` 后，运行 `build-release.bat` 可生成
 经过校验的本地工程 checkpoint。普通 source ZIP 不含被忽略的第三方本地 JAR；
 minimal-workspace ZIP 含精确依赖、Git bundle、恢复说明和全文件哈希。
 

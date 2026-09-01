@@ -273,12 +273,28 @@ tasks.register('verifyProductionJar') {
                     'com/maxenonyme/highseas/CreateHighSeas.class',
                     'com/maxenonyme/createsubmarine/submarine/mixin/CreateSubmarineMixinPlugin.class',
                     'data/minecraft/tags/entity_types/aquatic.json',
+                    'assets/minecraft/atlases/blocks.json',
+                    'assets/create_submarine/simulated/sections/submarine.json',
+                    'assets/create_submarine/textures/gui/sprites/banner.png',
+                    'assets/create_submarine/textures/gui/sprites/banner.png.mcmeta',
                     'assets/create_submarine/pinwheel/shader_modifiers/minecraft/shaders/core/rendertype_translucent.fsh.txt'
             ]
             requiredEntries.each { entry ->
                 if (archive.getEntry(entry) == null) {
                     throw new GradleException("Production JAR is missing ${entry}")
                 }
+            }
+
+            def section = new groovy.json.JsonSlurper().parse(
+                    archive.getInputStream(archive.getEntry('assets/create_submarine/simulated/sections/submarine.json')))
+            def atlas = new groovy.json.JsonSlurper().parse(
+                    archive.getInputStream(archive.getEntry('assets/minecraft/atlases/blocks.json')))
+            def bannerSources = atlas.sources.findAll { source -> source.sprite == section.sprite }
+            if (section.sprite != 'create_submarine:banner'
+                    || bannerSources.size() != 1
+                    || bannerSources[0].type != 'single'
+                    || bannerSources[0].resource != 'create_submarine:gui/sprites/banner') {
+                throw new GradleException('Production JAR does not register the Deep Seas creative banner sprite')
             }
 
             ['create_submarine.mixins.json', 'create_abyss.mixins.json'].each { configEntry ->

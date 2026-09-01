@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.3-port.3] - Creative section banner atlas fix
+
+### Bug Fixes
+- Registered `create_submarine:banner` in the Minecraft block atlas used by
+  Simulated's creative-section renderer. This restores the animated Deep Seas
+  title image instead of rendering the missing-texture checkerboard.
+- Added source and production-artifact contracts covering the section sprite,
+  atlas mapping, PNG dimensions and animation frame height.
+
 ## [2.2.3-port.2] - Forge renderer-stage compatibility
 
 ### Bug Fixes

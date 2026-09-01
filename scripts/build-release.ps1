@@ -9,7 +9,7 @@ $projectDir = Split-Path -Parent $PSScriptRoot
 $gradlePropertiesPath = Join-Path $projectDir 'gradle.properties'
 $gradleWrapperPath = Join-Path $projectDir 'gradlew.bat'
 $expectedBranch = 'port/forge-1.20.1'
-$expectedTests = 16
+$expectedTests = 17
 $expectedSuites = 7
 
 $requiredLocalFiles = [ordered]@{

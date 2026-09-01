@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -86,6 +88,37 @@ class PortResourceContractTest {
                     readObject(RESOURCES.resolve(config)).get("refmap").getAsString(),
                     () -> config + " must remap named injection points in production");
         }
+    }
+
+    @Test
+    void creativeSectionBannerIsRegisteredInTheBlockAtlas() throws IOException {
+        JsonObject section = readObject(RESOURCES.resolve(Path.of(
+                "assets", "create_submarine", "simulated", "sections", "submarine.json")));
+        String spriteId = section.get("sprite").getAsString();
+        assertEquals("create_submarine:banner", spriteId);
+
+        JsonArray sources = readObject(RESOURCES.resolve(Path.of(
+                "assets", "minecraft", "atlases", "blocks.json"))).getAsJsonArray("sources");
+        List<JsonObject> bannerSources = StreamSupport.stream(sources.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(source -> spriteId.equals(source.get("sprite").getAsString()))
+                .toList();
+        assertEquals(1, bannerSources.size(), "The section sprite must have one atlas source");
+        JsonObject bannerSource = bannerSources.get(0);
+        assertEquals("single", bannerSource.get("type").getAsString());
+        assertEquals("create_submarine:gui/sprites/banner",
+                bannerSource.get("resource").getAsString());
+
+        Path banner = RESOURCES.resolve(Path.of(
+                "assets", "create_submarine", "textures", "gui", "sprites", "banner.png"));
+        BufferedImage image = ImageIO.read(banner.toFile());
+        assertNotNull(image, "The creative section banner must be a readable PNG");
+        assertEquals(162, image.getWidth());
+        assertEquals(0, image.getHeight() % 18, "Banner frames must be 18 pixels high");
+
+        Path metadata = banner.resolveSibling(banner.getFileName() + ".mcmeta");
+        JsonObject animation = readObject(metadata).getAsJsonObject("animation");
+        assertEquals(18, animation.get("height").getAsInt());
     }
 
     @Test

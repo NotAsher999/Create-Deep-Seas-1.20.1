@@ -110,3 +110,11 @@ addon's wrapper at `renderLevel` `HEAD` placed its framebuffer and shader
 transitions ahead of unrelated opaque and Flywheel work and broke the owner's
 stage contract. The fix moves the stage; it does not disable water occlusion,
 force a renderer backend, or special case Create blocks.
+
+## D-016: addon section banners own their atlas entry
+
+The Deep Seas section keeps the upstream `create_submarine:banner` sprite ID
+and PNG. Because Simulated renders section banners from the Minecraft block
+atlas, Deep Seas must contribute its own `single` atlas source for that sprite.
+Do not copy the banner into Simulated or rely on another addon to enumerate
+Deep Seas resources; each addon owns the mapping for its own section asset.

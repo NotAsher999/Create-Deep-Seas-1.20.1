@@ -14,7 +14,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
-    @Inject(method = "renderLevel", at = @At("HEAD"))
+    /**
+     * Keep the Sable renderer-owner stage boundary: build the water depth masks
+     * after entities and block entities (including Flywheel visuals) have
+     * rendered, immediately before vanilla flushes the destruction overlay
+     * and enters the translucent terrain pass. This keeps its framebuffer and
+     * shader transitions out of the earlier opaque/Flywheel portion of the
+     * frame on Forge 1.20.1.
+     */
+    @Inject(
+            method = "renderLevel",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/RenderBuffers;crumblingBufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;",
+                    ordinal = 2,
+                    shift = At.Shift.AFTER))
     private void createsubmarine$preRenderTranslucent(PoseStack poseStack, float partialTick, long finishTimeNano,
             boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture,
             Matrix4f projection,

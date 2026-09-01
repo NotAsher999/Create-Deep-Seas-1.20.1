@@ -14,9 +14,9 @@ gameplay branch.
 | Local dependency inputs | Pass | Five JARs are SHA-256 locked in `gradle.properties`, dependency verification and the release script |
 | Remote dependencies | Pass | Gradle verification metadata plus explicit Copycats/Embeddium contract hashes |
 
-## Automated validation — 2026-08-31
+## Automated validation — 2026-09-01
 
-`gradlew clean build --no-daemon` completed with 15/15 tests in six suites,
+`gradlew clean build --no-daemon` completed with 16/16 tests in seven suites,
 zero failures, errors or skips. The build also ran `verifyProductionJar` against
 the final `build/libs` reobfuscated artifact.
 
@@ -38,6 +38,9 @@ Coverage includes:
 - the production manifest registers both Mixin configs, required resources and
   three entrypoint classes exist, obsolete 1.21 data paths are absent, and
   entrypoint bytecode is Java 17.
+- the water-occlusion pre-pass remains attached to the third
+  `crumblingBufferSource()` call, shifted `AFTER`, which is the Forge 1.20.1
+  boundary after block-entity/Flywheel rendering and before translucent terrain.
 
 ## Isolated runtime matrix
 
@@ -80,6 +83,36 @@ The run contains no `MixinApplyError`, `InvalidMixinException`, injection
 failure, `ReportedException`, fatal Deep Seas error or `shader is null` crash
 signature. Authentication, optional missing-content and other-mod model warnings
 remain unrelated environmental messages and were not suppressed by this port.
+
+## Port.2 moving-part regression A/B — 2026-09-01
+
+The first port.2 behavior candidate changed only the Deep Seas water-occlusion
+stage and retained the preceding Sable production JAR. Its temporary
+port.1-named production artifact had SHA-256
+`3B34BC92CB4E19791F8114C5D99D165DFF3BABE9D9E380B8FFF07595A5865AE3`.
+The PJ run from 00:34:59 through 00:37:10 entered the existing world, initialized
+the client Sable sublevel container, saved all dimensions and sublevels, and
+shut down normally. Its 1,510-line log has SHA-256
+`237AE2A706E53E49A664E02E644ED5E476CC8F5EDDFF336355E79D50C525621B`
+and contains no Mixin, fatal renderer, `shader is null`, or `GL_INVALID` failure.
+
+The user confirmed that the affected scene looked normal in that run and the
+previously invisible Create/Flywheel moving parts were visible again. This
+single-variable result is the runtime evidence for moving the pre-pass from
+`renderLevel` `HEAD` to Sable's renderer-owner boundary. Shader packs were
+disabled. A later run with the final port.2 artifact remains required for exact
+artifact correspondence; shader-pack-enabled rendering remains a separate
+optional-path gate.
+
+Three later remote-session attempts ended immediately after the local client
+UDP channel became active. The held Java process returned exit code `0`; there
+was no crash report, `hs_err`, Windows Error Reporting event, Mixin failure or
+fatal renderer error. The same UDP log line is present in the accepted run, and
+the user confirmed that their remote desktop sessions are frequently
+disconnected. Those attempts are therefore excluded as externally contaminated
+test runs: they are not evidence against either the final port.2 metadata or a
+Sable build. Exact-artifact gameplay acceptance is intentionally delegated to
+the user rather than converted into a speculative code workaround.
 
 ## Runtime defects found and closed
 

@@ -50,7 +50,7 @@ For development:
 .\gradlew.bat clean build --no-daemon
 ```
 
-After committing and creating annotated tag `v2.2.3-port.1`, run
+After committing and creating annotated tag `v2.2.3-port.2`, run
 `build-release.bat` to produce a verified local engineering checkpoint. The
 minimal-workspace ZIP contains the ignored local dependency inputs and an exact
 Git bundle; the ordinary source ZIP intentionally does not.

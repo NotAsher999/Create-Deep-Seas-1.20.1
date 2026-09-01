@@ -3,7 +3,7 @@
 ## One-click verified checkpoint
 
 Run `build-release.bat` from the repository root after the port has been
-committed and annotated tag `v2.2.3-port.1` points to that commit. The script
+committed and annotated tag `v2.2.3-port.2` points to that commit. The script
 refuses to package if the branch, tag, clean worktree, Java/Gradle version,
 dependency hashes, automated-test totals or production-JAR contracts differ
 from the recorded checkpoint.
@@ -13,8 +13,8 @@ ARR license still blocks public compiled redistribution without authorization.
 
 ## Outputs
 
-- `dist/create-deep-seas-forge-1.20.1-2.2.3-port.1.jar` — normal production JAR.
-- `release/2.2.3-port.1/` — production/sources JARs, exact tracked-source ZIP,
+- `dist/create-deep-seas-forge-1.20.1-2.2.3-port.2.jar` — normal production JAR.
+- `release/2.2.3-port.2/` — production/sources JARs, exact tracked-source ZIP,
   minimal-workspace ZIP, build log, dependency/checkpoint notes and SHA-256 sums.
 
 The tracked-source ZIP is a `git archive` and cannot build by itself because the

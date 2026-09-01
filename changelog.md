@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.2.3-port.2] - Forge renderer-stage compatibility
+
+### Bug Fixes
+- Restored Sable's water-occlusion pre-pass to its owner-defined render stage,
+  after entity and Flywheel visuals and before translucent terrain. This fixes
+  invisible moving Create parts in the tested Embeddium/Flywheel multi-mod
+  scene without disabling water occlusion or selecting a renderer by mod list.
+- Added a production contract test that locks the Forge 1.20.1 injection target,
+  ordinal and shift.
+
 ## [June 17, 2026] - Performance & Dedicated Server Fixes
 
 ### Bug Fixes & Refactoring

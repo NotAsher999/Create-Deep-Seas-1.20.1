@@ -99,3 +99,14 @@ engineering checkpoint. It does not upload, publish or grant redistribution
 rights. The ordinary source archive is intentionally incomplete without ignored
 local inputs; the minimal-workspace archive carries exact JAR hashes and a Git
 bundle so another maintainer can reproduce the checkpoint without chat history.
+
+## D-015: water occlusion follows its renderer-owner stage
+
+The restored Sable water-occlusion renderer must run at the same semantic stage
+as Sable's owner integration: after entity and block-entity/Flywheel rendering
+and immediately before translucent terrain. On Forge 1.20.1 this is the third
+`RenderBuffers.crumblingBufferSource()` call, shifted `AFTER`. Keeping the
+addon's wrapper at `renderLevel` `HEAD` placed its framebuffer and shader
+transitions ahead of unrelated opaque and Flywheel work and broke the owner's
+stage contract. The fix moves the stage; it does not disable water occlusion,
+force a renderer backend, or special case Create blocks.

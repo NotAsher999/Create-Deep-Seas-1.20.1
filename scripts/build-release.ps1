@@ -9,7 +9,7 @@ $projectDir = Split-Path -Parent $PSScriptRoot
 $gradlePropertiesPath = Join-Path $projectDir 'gradle.properties'
 $gradleWrapperPath = Join-Path $projectDir 'gradlew.bat'
 $expectedBranch = 'port/forge-1.20.1'
-$expectedTests = 17
+$expectedTests = 18
 $expectedSuites = 7
 
 $requiredLocalFiles = [ordered]@{
@@ -648,7 +648,7 @@ try {
         '- Exact final port.2 gameplay acceptance: delegated to the user; remote-session exit-0 attempts were excluded as non-diagnostic',
         '- Public compiled redistribution: not authorized by this checkpoint',
         '',
-        'The minimal-workspace ZIP contains the exact Git bundle and hash-locked local inputs needed for recovery.'
+        'The minimal-workspace ZIP contains the exact Git bundle and manifested local inputs needed for recovery.'
     ) | Set-Content -LiteralPath (Join-Path $stagingRoot 'RELEASE_NOTES.md') -Encoding UTF8
 
     Copy-Item -LiteralPath (Join-Path $workspaceStage 'BUILD_INPUTS_SHA256.txt') `

@@ -1,8 +1,8 @@
 package com.maxenonyme.createsubmarine.submarine.mixin.compat.simulated;
 
 import dev.simulated_team.simulated.content.entities.diagram.screen.DiagramScreen;
-import dev.ryanhcode.sable.api.physics.force.ForceGroup;
 import dev.simulated_team.simulated.content.entities.diagram.screen.ForceClusterFinder;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,24 +17,19 @@ import org.joml.Vector3d;
 @Mixin(value = DiagramScreen.class, remap = false)
 public class DiagramScreenMixin {
 
+    private static final ResourceLocation BALLAST_FORCE_GROUP =
+            new ResourceLocation("create_submarine", "ballast");
+
     @Inject(method = "renderArrows", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;", ordinal = 1))
     private void createsubmarine$alwaysMergeBallast(
             net.minecraft.client.gui.GuiGraphics graphics, int mouseX, int mouseY, int areaOriginX, int areaOriginY,
             org.joml.Quaternionfc orientation, org.joml.Vector3dc cameraPos, org.joml.Matrix4fc projMatrix, int areaWidth, int areaHeight,
             CallbackInfo ci,
-            @Local Map<ForceGroup, List<ForceClusterFinder.Cluster>> clusters,
+            @Local Map<ResourceLocation, List<ForceClusterFinder.Cluster>> clusters,
             @Local com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef maxArrowLengthSquaredRef
     ) {
-        ForceGroup ballastGroup = null;
-        for (ForceGroup group : clusters.keySet()) {
-            net.minecraft.resources.ResourceLocation id = dev.ryanhcode.sable.api.physics.force.ForceGroups.REGISTRY.getKey(group);
-            if (id != null && id.getNamespace().equals("create_submarine") && id.getPath().equals("ballast")) {
-                ballastGroup = group;
-                break;
-            }
-        }
-        if (ballastGroup != null) {
-            List<ForceClusterFinder.Cluster> list = clusters.get(ballastGroup);
+        if (clusters.containsKey(BALLAST_FORCE_GROUP)) {
+            List<ForceClusterFinder.Cluster> list = clusters.get(BALLAST_FORCE_GROUP);
             if (list != null && !list.isEmpty()) {
                 Vector3d totalForce = new Vector3d();
                 Vector3d averagePos = new Vector3d();
@@ -52,7 +47,7 @@ public class DiagramScreenMixin {
                 );
                 List<ForceClusterFinder.Cluster> newList = new ArrayList<>();
                 newList.add(merged);
-                clusters.put(ballastGroup, newList);
+                clusters.put(BALLAST_FORCE_GROUP, newList);
                 double maxVal = 0.0;
                 for (List<ForceClusterFinder.Cluster> clList : clusters.values()) {
                     for (ForceClusterFinder.Cluster c : clList) {

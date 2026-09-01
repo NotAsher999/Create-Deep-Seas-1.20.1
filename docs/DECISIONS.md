@@ -118,3 +118,12 @@ and PNG. Because Simulated renders section banners from the Minecraft block
 atlas, Deep Seas must contribute its own `single` atlas source for that sprite.
 Do not copy the banner into Simulated or rely on another addon to enumerate
 Deep Seas resources; each addon owns the mapping for its own section asset.
+
+## D-017: diagram force maps follow the dependency's identifier ABI
+
+The formal Simulated 1.20.1 port keys diagram force clusters by
+`ResourceLocation`, not live `ForceGroup` objects. Deep Seas therefore addresses
+its ballast group by `create_submarine:ballast` and leaves registry lookup to
+Simulated's rendering loop. Do not recover from key-shape drift with raw maps,
+exception swallowing or save-specific checks; verify the referenced class's
+local-variable signature and the compiled Mixin handler together.

@@ -11,12 +11,12 @@ gameplay branch.
 | Fork/upstream baseline | Pass | Both started at `37b876c`; latest remote check still found no newer `main` commit |
 | Original 2.2.3 JAR | Missing input | No matching release JAR exists in supplied material; binary correspondence is not claimed |
 | Java/Forge target | Pass | Java 17 class major 61; Forge 47.4.0 metadata and Gradle toolchain |
-| Local dependency inputs | Pass | Five JARs are SHA-256 locked in `gradle.properties`, dependency verification and the release script |
-| Remote dependencies | Pass | Gradle verification metadata plus explicit Copycats/Embeddium contract hashes |
+| Local dependency inputs | Pass | Five JARs are required; versions and API/JAR contracts are checked by default, fixed SHA checks are audit-only, and copied release inputs are manifested |
+| Remote dependencies | Pass | Gradle resolution plus explicit Copycats/Embeddium API and bytecode contracts; fixed artifact SHA checks are audit-only |
 
 ## Automated validation — 2026-09-01
 
-`gradlew clean build --no-daemon` completed with 17/17 tests in seven suites,
+`gradlew clean build --no-daemon` completed with 18/18 tests in seven suites,
 zero failures, errors or skips. The build also ran `verifyProductionJar` against
 the final `build/libs` reobfuscated artifact.
 
@@ -33,6 +33,9 @@ Coverage includes:
   explicitly remaps that Minecraft call;
 - the locked Sable chunked renderer still returns `int`, while both pocket-fog
   handlers use `CallbackInfoReturnable<Integer>`;
+- the referenced Simulated `renderArrows` local-variable table identifies
+  `clusters` as `Map<ResourceLocation, List<Cluster>>`, and the compiled Deep
+  Seas handler captures that key type without a `ForceGroup` cast;
 - both production Mixin configs bind `createdeepseas.refmap.json`, every listed
   Mixin class is present, and the rope target maps to SRG `m_82509_`;
 - the production manifest registers both Mixin configs, required resources and
@@ -145,6 +148,30 @@ or `dist` outputs. Hashing was then moved to an in-script .NET SHA-256 helper so
 the one-click checkpoint no longer depends on module auto-loading. A successful
 formal run and its generated manifests are the release acceptance gate.
 
+## Port.3 structure-diagram crash and port.4 correction — 2026-09-01
+
+The user-owned `DeceasedCraft_CB` client crashed at 16:32:19 while rendering a
+Simulated structure diagram. The first application frame was Deep Seas'
+`DiagramScreenMixin`: it cast a `ResourceLocation` cluster key to Sable's
+`ForceGroup`. Ponder and FancyMenu were downstream screen frames, not the source.
+The integrated server completed its world and Sable sublevel saves during the
+client shutdown, so the log did not indicate save corruption.
+
+The formal Simulated port changed `DiagramScreen.renderArrows` in checkpoint
+`c2884e1` from `Map<ForceGroup, List<Cluster>>` to stable
+`Map<ResourceLocation, List<Cluster>>` keys. The inherited Deep Seas Mixin still
+captured the older generic shape; type erasure allowed compilation and injection,
+then the enhanced-for loop emitted the failing runtime cast. Port.4 now addresses
+`create_submarine:ballast` directly in the identifier-keyed map. It does not
+change Sable, suppress the exception, disable diagram arrows, or special-case
+the affected save.
+
+The first targeted test attempt was rejected by `compileTestJava` because the
+new test omitted the static `assertFalse` import; production compilation had
+already succeeded. After correcting that test-only error, the targeted contract
+test and the full clean 18-test build passed. Exact-artifact diagram reopening
+remains the user runtime gate.
+
 ## Runtime defects found and closed
 
 ### Creative section banner atlas
@@ -155,6 +182,15 @@ upstream, but neither upstream nor the port contributed the required
 `minecraft:blocks` atlas source for `create_submarine:banner`. Port.3 adds one
 addon-owned `single` source and locks the complete section-to-atlas-to-PNG
 contract without modifying Simulated or copying another addon's resources.
+
+### Simulated diagram cluster-key ABI
+
+The formal 1.20.1 Simulated port uses registry identifiers as diagram force-map
+keys so serialized/configured force-group IDs remain stable. Deep Seas now looks
+up and replaces only `create_submarine:ballast` by that identifier. The build
+checks both the dependency local-variable generic signature and the compiled
+handler's casts, preventing a source-compatible generic mismatch from reaching
+another production client.
 
 ### Sable force-group verifier
 
@@ -201,5 +237,7 @@ The recorded production run proves startup, world entry, Sable sublevel
 lifecycle, resource reload, renderer coexistence, save and clean shutdown in the
 full PJ environment. It does not by itself prove every submarine block's
 gameplay behavior, a shader-pack-enabled render path, or Copycats behavior in
-that exact PJ run. Those are retained as explicit manual follow-up gates rather
-than being reported as completed tests.
+that exact PJ run. Port.4's structure-diagram correction is statically and
+automatically verified but still awaits an exact-artifact reopen by the user.
+Those are retained as explicit manual follow-up gates rather than being reported
+as completed tests.

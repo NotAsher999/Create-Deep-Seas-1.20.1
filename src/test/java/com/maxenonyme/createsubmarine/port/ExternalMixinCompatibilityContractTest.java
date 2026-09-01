@@ -2,6 +2,7 @@ package com.maxenonyme.createsubmarine.port;
 
 import com.maxenonyme.createsubmarine.submarine.mixin.RopeStrandHolderBehaviorMixin;
 import com.maxenonyme.createsubmarine.submarine.mixin.compat.sable.SableSubLevelPocketFogMixin;
+import com.maxenonyme.createsubmarine.submarine.mixin.compat.simulated.DiagramScreenMixin;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -22,6 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,6 +45,19 @@ class ExternalMixinCompatibilityContractTest {
 
     private static final String SABLE_RENDER_DATA =
             "dev/ryanhcode/sable/sublevel/render/vanilla/VanillaChunkedSubLevelRenderData";
+    private static final String DIAGRAM_SCREEN =
+            "dev/simulated_team/simulated/content/entities/diagram/screen/DiagramScreen";
+    private static final String RENDER_ARROWS =
+            "(Lnet/minecraft/client/gui/GuiGraphics;IIIILorg/joml/Quaternionfc;" +
+            "Lorg/joml/Vector3dc;Lorg/joml/Matrix4fc;II)V";
+    private static final String RESOURCE_LOCATION =
+            "net/minecraft/resources/ResourceLocation";
+    private static final String FORCE_GROUP =
+            "dev/ryanhcode/sable/api/physics/force/ForceGroup";
+    private static final String CLUSTERS_SIGNATURE =
+            "Ljava/util/Map<Lnet/minecraft/resources/ResourceLocation;" +
+            "Ljava/util/List<Ldev/simulated_team/simulated/content/entities/diagram/screen/" +
+            "ForceClusterFinder$Cluster;>;>;";
     private static final String RENDER_CHUNKED_SUB_LEVEL =
             "(Lnet/minecraft/client/renderer/RenderType;" +
             "Lnet/minecraft/client/renderer/ShaderInstance;" +
@@ -158,6 +173,72 @@ class ExternalMixinCompatibilityContractTest {
                 "createsubmarine$defogEnd" + FOG_HANDLER), handlers);
     }
 
+    @Test
+    void diagramBallastMixinUsesTheReferencedResourceLocationClusterKeys() throws Exception {
+        Path jar = Path.of(System.getProperty("createDeepSeas.simulatedJar"));
+        ReferenceModHashVerification.assertMatches(jar, SIMULATED_SHA256);
+
+        final boolean[] foundTarget = {false};
+        final String[] targetClustersSignature = {null};
+        try (ZipFile zip = new ZipFile(jar.toFile())) {
+            ZipEntry entry = zip.getEntry(DIAGRAM_SCREEN + ".class");
+            assertNotNull(entry, "Referenced Simulated artifact lacks DiagramScreen");
+            try (InputStream input = zip.getInputStream(entry)) {
+                new ClassReader(input).accept(new ClassVisitor(Opcodes.ASM9) {
+                    @Override
+                    public MethodVisitor visitMethod(int access, String name, String descriptor,
+                            String signature, String[] exceptions) {
+                        if (!"renderArrows".equals(name) || !RENDER_ARROWS.equals(descriptor)) {
+                            return null;
+                        }
+                        foundTarget[0] = true;
+                        return new MethodVisitor(Opcodes.ASM9) {
+                            @Override
+                            public void visitLocalVariable(String name, String descriptor, String signature,
+                                    org.objectweb.asm.Label start, org.objectweb.asm.Label end, int index) {
+                                if ("clusters".equals(name)) {
+                                    targetClustersSignature[0] = signature;
+                                }
+                            }
+                        };
+                    }
+                }, ClassReader.SKIP_FRAMES);
+            }
+        }
+        assertTrue(foundTarget[0], "Referenced Simulated renderArrows ABI changed");
+        assertEquals(CLUSTERS_SIGNATURE, targetClustersSignature[0],
+                "Simulated diagram cluster keys are no longer ResourceLocation identifiers");
+
+        final boolean[] foundHandler = {false};
+        final String[] handlerSignature = {null};
+        final Set<String> handlerCasts = new HashSet<>();
+        readCompiledClass(DiagramScreenMixin.class, new ClassVisitor(Opcodes.ASM9) {
+            @Override
+            public MethodVisitor visitMethod(int access, String name, String descriptor,
+                    String signature, String[] exceptions) {
+                if (!"createsubmarine$alwaysMergeBallast".equals(name)) {
+                    return null;
+                }
+                foundHandler[0] = true;
+                handlerSignature[0] = signature;
+                return new MethodVisitor(Opcodes.ASM9) {
+                    @Override
+                    public void visitTypeInsn(int opcode, String type) {
+                        if (opcode == Opcodes.CHECKCAST) {
+                            handlerCasts.add(type);
+                        }
+                    }
+                };
+            }
+        }, ClassReader.SKIP_FRAMES);
+        assertTrue(foundHandler[0], "Missing Deep Seas ballast diagram handler");
+        assertTrue(handlerSignature[0] != null &&
+                        handlerSignature[0].contains("Ljava/util/Map<L" + RESOURCE_LOCATION + ";"),
+                "Deep Seas ballast diagram handler must capture ResourceLocation-keyed clusters");
+        assertFalse(handlerCasts.contains(FORCE_GROUP),
+                "Deep Seas ballast diagram handler must not cast ResourceLocation keys to ForceGroup");
+    }
+
     private static void assertJarMethod(Path jar, String className, String methodName,
             String methodDescriptor) throws IOException {
         try (ZipFile zip = new ZipFile(jar.toFile())) {
@@ -180,11 +261,15 @@ class ExternalMixinCompatibilityContractTest {
     }
 
     private static void readCompiledClass(Class<?> type, ClassVisitor visitor) throws IOException {
+        readCompiledClass(type, visitor,
+                ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+    }
+
+    private static void readCompiledClass(Class<?> type, ClassVisitor visitor, int flags) throws IOException {
         String resource = "/" + type.getName().replace('.', '/') + ".class";
         try (InputStream input = type.getResourceAsStream(resource)) {
             assertNotNull(input, () -> "Missing compiled class " + resource);
-            new ClassReader(input).accept(visitor, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG |
-                    ClassReader.SKIP_FRAMES);
+            new ClassReader(input).accept(visitor, flags);
         }
     }
 

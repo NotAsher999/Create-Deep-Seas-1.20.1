@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.2.3-port.4] - Simulated diagram force-key compatibility
+
+### Bug Fixes
+- Updated the Deep Seas ballast aggregation Mixin to use Simulated's current
+  `ResourceLocation`-keyed force-cluster map. Opening a populated structure
+  diagram no longer casts a force-group identifier to `ForceGroup`.
+- Added a dependency-bytecode contract that locks the referenced Simulated
+  local-variable signature and verifies that the Deep Seas handler does not
+  emit the invalid `ForceGroup` cast.
+
 ## [2.2.3-port.3] - Creative section banner atlas fix
 
 ### Bug Fixes

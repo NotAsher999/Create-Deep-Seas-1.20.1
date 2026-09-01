@@ -16,7 +16,7 @@ gameplay branch.
 
 ## Automated validation — 2026-09-01
 
-`gradlew clean build --no-daemon` completed with 18/18 tests in seven suites,
+`gradlew clean build --no-daemon` completed with 20/20 tests in eight suites,
 zero failures, errors or skips. The build also ran `verifyProductionJar` against
 the final `build/libs` reobfuscated artifact.
 
@@ -46,6 +46,9 @@ Coverage includes:
   boundary after block-entity/Flywheel rendering and before translucent terrain.
 - the Deep Seas creative section's `create_submarine:banner` sprite has one
   block-atlas source, a readable 162-pixel-wide PNG and 18-pixel animation frames.
+- the Global Settings button opens the Forge replacement rather than the mod
+  list; all 18 public production values are bound, while internal welcome/update
+  state stays hidden, and both primary locales provide labels and tooltips.
 
 ## Isolated runtime matrix
 
@@ -169,8 +172,27 @@ the affected save.
 The first targeted test attempt was rejected by `compileTestJava` because the
 new test omitted the static `assertFalse` import; production compilation had
 already succeeded. After correcting that test-only error, the targeted contract
-test and the full clean 18-test build passed. Exact-artifact diagram reopening
+test and the then-current clean 18-test build passed. Exact-artifact diagram reopening
 remains the user runtime gate.
+
+## Port.4 incomplete global-settings route and port.5 correction — 2026-09-01
+
+Forge runtime evidence showed that the custom hull-strength screen opened, but
+pressing Global Settings immediately returned to Forge's mod list without an
+exception. Source audit found that the port had replaced NeoForge's generic
+`ConfigurationScreen` with a direct `new ModListScreen(this)` call. Forge 47
+does not provide an equivalent generic screen, so this was an incomplete API
+translation rather than a runtime compatibility failure.
+
+Port.5 adds a dependency-free Forge 1.20.1 replacement. It presents every one
+of the 18 public production values from `SubmarineConfig` in five scrollable
+sections. Boolean and numeric edits remain local to the screen until Save;
+numeric ranges and defaults are read from the live `ForgeConfigSpec`, all values
+validate before any are applied, and Cancel/Escape leave the loaded config
+unchanged. Development-only welcome/update bookkeeping is deliberately not
+exposed. Automated source and artifact contracts cover navigation, full setting
+coverage, English/Chinese localization and final-JAR inclusion. Exact visual and
+interaction acceptance remains delegated to the user.
 
 ## Runtime defects found and closed
 

@@ -9,8 +9,8 @@ $projectDir = Split-Path -Parent $PSScriptRoot
 $gradlePropertiesPath = Join-Path $projectDir 'gradle.properties'
 $gradleWrapperPath = Join-Path $projectDir 'gradlew.bat'
 $expectedBranch = 'port/forge-1.20.1'
-$expectedTests = 18
-$expectedSuites = 7
+$expectedTests = 20
+$expectedSuites = 8
 
 $requiredLocalFiles = [ordered]@{
     'localDeps\sable-forge-1.20.1-2.0.5-port.1-dev.jar' =
@@ -645,7 +645,8 @@ try {
         '- Clean Forge build and production-JAR verification: passed',
         '- Previous production checkpoint: PJ world entry, F3+T, pause/resume, save and shutdown passed',
         '- Port.2 stage candidate: affected moving parts visible; PJ world entry, save and shutdown passed with shader packs disabled',
-        '- Exact final port.2 gameplay acceptance: delegated to the user; remote-session exit-0 attempts were excluded as non-diagnostic',
+        '- Port.5 configuration-screen source and production-artifact contracts: passed',
+        '- Exact final port.5 gameplay and configuration UI acceptance: delegated to the user; remote-session exit-0 attempts were excluded as non-diagnostic',
         '- Public compiled redistribution: not authorized by this checkpoint',
         '',
         'The minimal-workspace ZIP contains the exact Git bundle and manifested local inputs needed for recovery.'

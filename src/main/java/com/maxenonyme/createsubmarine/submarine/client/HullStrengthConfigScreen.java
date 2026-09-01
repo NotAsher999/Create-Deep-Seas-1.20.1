@@ -70,7 +70,8 @@ public class HullStrengthConfigScreen extends Screen {
         this.btnApply.visible = false;
         this.addRenderableWidget(this.btnApply);
 
-        this.addRenderableWidget(Button.builder(Component.translatable("create_submarine.ui.button.global_settings"), btn -> this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this)))
+        this.addRenderableWidget(Button.builder(Component.translatable("create_submarine.ui.button.global_settings"),
+                        btn -> this.minecraft.setScreen(new GlobalSettingsScreen(this)))
                 .bounds(10, this.height - 30, leftWidth - 20, 20)
                 .build());
 

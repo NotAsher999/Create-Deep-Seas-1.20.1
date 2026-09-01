@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.2.3-port.5] - Forge global configuration screen
+
+### Bug Fixes
+- Replaced the incomplete Forge fallback that sent the Global Settings button
+  back to the mod list with a native, scrollable configuration screen covering
+  all 18 public Deep Seas settings.
+- Preserved upstream configuration behavior without adding a GUI-library
+  dependency: edits are staged, all numeric values are validated against the
+  live `ForgeConfigSpec` ranges, Save writes the common config, and Cancel or
+  Escape discards pending changes.
+- Added English and Simplified Chinese labels/tooltips plus source and packaged
+  artifact contracts for the complete configuration route.
+
 ## [2.2.3-port.4] - Simulated diagram force-key compatibility
 
 ### Bug Fixes

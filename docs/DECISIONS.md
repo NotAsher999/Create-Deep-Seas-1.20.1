@@ -127,3 +127,13 @@ its ballast group by `create_submarine:ballast` and leaves registry lookup to
 Simulated's rendering loop. Do not recover from key-shape drift with raw maps,
 exception swallowing or save-specific checks; verify the referenced class's
 local-variable signature and the compiled Mixin handler together.
+
+## D-018: Forge owns an explicit replacement for NeoForge's configuration UI
+
+NeoForge's generic `ConfigurationScreen` has no Forge 47 equivalent. Returning
+to `ModListScreen` is navigation, not a configuration implementation, so the
+Forge port provides a small native screen bound directly to `SubmarineConfig`.
+It derives defaults and numeric limits from the live `ForgeConfigSpec`, stages
+changes until confirmation and excludes internal bookkeeping values. Do not add
+a mandatory third-party configuration-screen mod or duplicate config storage to
+paper over this loader API difference.

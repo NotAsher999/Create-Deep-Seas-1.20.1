@@ -273,6 +273,7 @@ tasks.register('verifyProductionJar') {
                     'createdeepseas.refmap.json',
                     'META-INF/mods.toml',
                     'com/maxenonyme/createsubmarine/CreateSubmarine.class',
+                    'com/maxenonyme/createsubmarine/submarine/client/GlobalSettingsScreen.class',
                     'com/maxenonyme/AbyssDimension/CreateAbyss.class',
                     'com/maxenonyme/highseas/CreateHighSeas.class',
                     'com/maxenonyme/createsubmarine/submarine/mixin/CreateSubmarineMixinPlugin.class',

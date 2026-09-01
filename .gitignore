@@ -25,6 +25,8 @@
 hs_err_pid*
 replay_pid*
 /Docs
+!/docs/
+!/docs/**
 /.vscode
 /run
 /build

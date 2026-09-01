@@ -31,8 +31,10 @@ not be placed in `mods`.
 
 ## Port status
 
-The Forge workspace builds from a clean checkout when its five hash-locked
-local dependency JARs are present. The production JAR has been exercised in the
+The Forge workspace builds from a clean checkout when its five required local
+dependency JARs are present. Normal builds validate their versions and API/JAR
+contracts without pinning old file hashes; exact hashes remain recorded for
+audits and can be opted into with `-Pverify_reference_mod_hashes=true`. The production JAR has been exercised in the
 PJ multi-mod instance through world entry, Sable sublevel creation, F3+T resource
 reload, pause/resume, save and clean shutdown. Base, Copycats, Embeddium and
 Copycats+Embeddium client profiles, plus base/Copycats dedicated-server profiles,

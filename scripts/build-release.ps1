@@ -35,6 +35,8 @@ function Read-GradleProperty {
     return $match.Matches[0].Groups[1].Value.Trim()
 }
 
+$verifyReferenceModHashes = (Read-GradleProperty -Name 'verify_reference_mod_hashes') -eq 'true'
+
 function Assert-StrictChildPath {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
@@ -105,9 +107,18 @@ function Assert-FileHash {
 }
 
 function Assert-LocalInputs {
-    foreach ($entry in $requiredLocalFiles.GetEnumerator()) {
-        Assert-FileHash -Path (Join-Path $projectDir $entry.Key) `
-            -ExpectedSha256 $entry.Value -Description $entry.Key
+    foreach ($relativePath in @($requiredLocalFiles.Keys)) {
+        $path = Join-Path $projectDir $relativePath
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+            throw "Missing required file: $relativePath ($path)"
+        }
+        $actual = Get-Sha256 -Path $path
+        if ($verifyReferenceModHashes -and $actual -ne $requiredLocalFiles[$relativePath]) {
+            throw "SHA-256 mismatch for $relativePath. Expected $($requiredLocalFiles[$relativePath]), found $actual."
+        }
+        if (-not $verifyReferenceModHashes) {
+            $requiredLocalFiles[$relativePath] = $actual
+        }
     }
 }
 

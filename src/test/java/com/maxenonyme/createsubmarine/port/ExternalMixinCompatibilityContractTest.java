@@ -15,11 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -57,9 +54,9 @@ class ExternalMixinCompatibilityContractTest {
             Type.getDescriptor(CallbackInfoReturnable.class) + ")V";
 
     @Test
-    void lockedSimulatedArtifactStillContainsTheRemappedRopeInvocation() throws Exception {
+    void referencedSimulatedArtifactStillContainsTheRemappedRopeInvocation() throws Exception {
         Path jar = Path.of(System.getProperty("createDeepSeas.simulatedJar"));
-        assertEquals(SIMULATED_SHA256, sha256(jar));
+        ReferenceModHashVerification.assertMatches(jar, SIMULATED_SHA256);
 
         try (ZipFile zip = new ZipFile(jar.toFile())) {
             ZipEntry entry = zip.getEntry(ROPE_HOLDER + ".class");
@@ -140,9 +137,9 @@ class ExternalMixinCompatibilityContractTest {
     }
 
     @Test
-    void lockedSableRendererAndFogCallbacksAgreeOnTheIntegerReturnContract() throws Exception {
+    void referencedSableRendererAndFogCallbacksAgreeOnTheIntegerReturnContract() throws Exception {
         Path jar = Path.of(System.getProperty("createDeepSeas.sableJar"));
-        assertEquals(SABLE_SHA256, sha256(jar));
+        ReferenceModHashVerification.assertMatches(jar, SABLE_SHA256);
         assertJarMethod(jar, SABLE_RENDER_DATA, "renderChunkedSubLevel", RENDER_CHUNKED_SUB_LEVEL);
 
         Set<String> handlers = new HashSet<>();
@@ -191,15 +188,4 @@ class ExternalMixinCompatibilityContractTest {
         }
     }
 
-    private static String sha256(Path path) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream input = Files.newInputStream(path)) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = input.read(buffer)) >= 0) {
-                digest.update(buffer, 0, read);
-            }
-        }
-        return HexFormat.of().withUpperCase().formatHex(digest.digest());
-    }
 }

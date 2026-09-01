@@ -18,12 +18,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -61,9 +57,9 @@ class EmbeddiumCompatibilityContractTest {
             "renderModel(Lme/jellysquid/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderContext;Lme/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuildBuffers;)V";
 
     @Test
-    void lockedEmbeddiumArtifactStillExposesThePortedTargets() throws Exception {
+    void referencedEmbeddiumArtifactStillExposesThePortedTargets() throws Exception {
         Path jar = Path.of(System.getProperty("createDeepSeas.embeddiumJar"));
-        assertEquals(EXPECTED_SHA256, sha256(jar));
+        ReferenceModHashVerification.assertMatches(jar, EXPECTED_SHA256);
 
         try (ZipFile zip = new ZipFile(jar.toFile())) {
             String metadata = readText(zip, "META-INF/mods.toml");
@@ -210,18 +206,6 @@ class EmbeddiumCompatibilityContractTest {
         try (InputStream input = zip.getInputStream(entry)) {
             return new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
         }
-    }
-
-    private static String sha256(Path path) throws IOException, NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream input = Files.newInputStream(path)) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = input.read(buffer)) >= 0) {
-                digest.update(buffer, 0, read);
-            }
-        }
-        return HexFormat.of().withUpperCase().formatHex(digest.digest());
     }
 
     private record ClassContract(Set<String> methods, Set<String> fields) {

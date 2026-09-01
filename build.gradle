@@ -186,6 +186,9 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('test', Test).configure {
     useJUnitPlatform()
+    def verifyReferenceModHashes = providers.gradleProperty('verify_reference_mod_hashes')
+            .map { it.toBoolean() }
+            .getOrElse(false)
     inputs.files(configurations.copycatsContract)
     inputs.files(configurations.embeddiumContract)
     def simulatedDevJar = layout.projectDirectory.file(
@@ -195,6 +198,7 @@ tasks.named('test', Test).configure {
     inputs.file(simulatedDevJar)
     inputs.file(sableDevJar)
     doFirst {
+        systemProperty 'modPort.verifyReferenceModHashes', verifyReferenceModHashes
         systemProperty 'createDeepSeas.copycatsJar', configurations.copycatsContract.singleFile.absolutePath
         systemProperty 'createDeepSeas.embeddiumJar', configurations.embeddiumContract.singleFile.absolutePath
         systemProperty 'createDeepSeas.simulatedJar', simulatedDevJar.asFile.absolutePath

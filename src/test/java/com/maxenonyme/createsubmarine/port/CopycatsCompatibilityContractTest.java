@@ -14,11 +14,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -36,9 +33,9 @@ class CopycatsCompatibilityContractTest {
             "onWrenched(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;";
 
     @Test
-    void lockedCopycatsArtifactStillExposesThePortedInterfaceMethod() throws Exception {
+    void referencedCopycatsArtifactStillExposesThePortedInterfaceMethod() throws Exception {
         Path jar = Path.of(System.getProperty("createDeepSeas.copycatsJar"));
-        assertEquals(EXPECTED_SHA256, sha256(jar));
+        ReferenceModHashVerification.assertMatches(jar, EXPECTED_SHA256);
 
         try (ZipFile zip = new ZipFile(jar.toFile())) {
             ZipEntry entry = zip.getEntry(TARGET + ".class");
@@ -135,15 +132,4 @@ class CopycatsCompatibilityContractTest {
         assertTrue(injections.contains("useOn"));
     }
 
-    private static String sha256(Path path) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream input = Files.newInputStream(path)) {
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = input.read(buffer)) >= 0) {
-                digest.update(buffer, 0, read);
-            }
-        }
-        return HexFormat.of().withUpperCase().formatHex(digest.digest());
-    }
 }

@@ -21,5 +21,5 @@ jobs:
         run: ./gradlew --version --no-daemon
       - name: Explain the formal build boundary
         run: |
-          echo 'The full Forge build requires five ignored SHA-256-locked local inputs.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The full Forge build requires five ignored local inputs; normal builds validate contracts without fixed input hashes.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Use the local release script or release minimal-workspace; see docs/RELEASE.md.' >> "$GITHUB_STEP_SUMMARY"

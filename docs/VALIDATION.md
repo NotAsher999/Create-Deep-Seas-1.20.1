@@ -114,6 +114,15 @@ test runs: they are not evidence against either the final port.2 metadata or a
 Sable build. Exact-artifact gameplay acceptance is intentionally delegated to
 the user rather than converted into a speculative code workaround.
 
+## Formal packaging retry — 2026-09-01
+
+The first tagged packaging attempt stopped before Gradle ran because the local
+Windows PowerShell 5.1 process could not resolve the optional `Get-FileHash`
+cmdlet. The script reported failure and did not replace the existing `release`
+or `dist` outputs. Hashing was then moved to an in-script .NET SHA-256 helper so
+the one-click checkpoint no longer depends on module auto-loading. A successful
+formal run and its generated manifests are the release acceptance gate.
+
 ## Runtime defects found and closed
 
 ### Sable force-group verifier

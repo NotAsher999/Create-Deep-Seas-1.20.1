@@ -66,6 +66,28 @@ function Reset-StrictChildDirectory {
     return $fullPath
 }
 
+function Get-Sha256 {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "Cannot hash missing file: $Path"
+    }
+
+    $stream = [System.IO.File]::OpenRead($Path)
+    try {
+        $sha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            return ([System.BitConverter]::ToString($sha256.ComputeHash($stream))).Replace('-', '')
+        }
+        finally {
+            $sha256.Dispose()
+        }
+    }
+    finally {
+        $stream.Dispose()
+    }
+}
+
 function Assert-FileHash {
     param(
         [Parameter(Mandatory = $true)][string]$Path,
@@ -76,7 +98,7 @@ function Assert-FileHash {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
         throw "Missing required file: $Description ($Path)"
     }
-    $actual = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+    $actual = Get-Sha256 -Path $Path
     if ($actual -ne $ExpectedSha256) {
         throw "SHA-256 mismatch for $Description. Expected $ExpectedSha256, found $actual."
     }
@@ -258,7 +280,7 @@ function Write-DirectoryManifest {
         $full = [System.IO.Path]::GetFullPath($_.FullName)
         if ($full -ne $manifestFull) {
             $relative = $full.Substring($rootPrefix.Length).Replace('\', '/')
-            $hash = (Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash
+            $hash = Get-Sha256 -Path $full
             $lines += "$hash  $relative"
         }
     }
@@ -317,7 +339,7 @@ function Write-Sha256Sums {
     $lines = @()
     Get-ChildItem -LiteralPath $Directory -File | Sort-Object Name | ForEach-Object {
         if ([System.IO.Path]::GetFullPath($_.FullName) -ne $outputFull) {
-            $lines += "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)  $($_.Name)"
+            $lines += "$(Get-Sha256 -Path $_.FullName)  $($_.Name)"
         }
     }
     $lines | Set-Content -LiteralPath $OutputPath -Encoding UTF8
@@ -584,9 +606,9 @@ try {
     Copy-Item -LiteralPath $builtMainJar -Destination (Join-Path $stagingRoot $mainJarName)
     Copy-Item -LiteralPath $builtSourcesJar -Destination (Join-Path $stagingRoot $sourcesJarName)
     Assert-FileHash -Path (Join-Path $stagingRoot $mainJarName) `
-        -ExpectedSha256 (Get-FileHash -LiteralPath $builtMainJar -Algorithm SHA256).Hash -Description $mainJarName
+        -ExpectedSha256 (Get-Sha256 -Path $builtMainJar) -Description $mainJarName
     Assert-FileHash -Path (Join-Path $stagingRoot $sourcesJarName) `
-        -ExpectedSha256 (Get-FileHash -LiteralPath $builtSourcesJar -Algorithm SHA256).Hash -Description $sourcesJarName
+        -ExpectedSha256 (Get-Sha256 -Path $builtSourcesJar) -Description $sourcesJarName
 
     @(
         "Create Deep Seas $modVersion",
@@ -666,7 +688,7 @@ try {
         }
         Move-Item -LiteralPath $stagingRoot -Destination $finalReleaseDir
         Copy-Item -LiteralPath (Join-Path $finalReleaseDir $mainJarName) -Destination $distMain -Force
-        $distHash = (Get-FileHash -LiteralPath $distMain -Algorithm SHA256).Hash
+        $distHash = Get-Sha256 -Path $distMain
         "$distHash  $mainJarName" | Set-Content -LiteralPath $distSums -Encoding UTF8
         Assert-FileHash -Path $distMain -ExpectedSha256 $distHash -Description 'dist production JAR'
         if (Test-Path -LiteralPath $previousReleaseDir) {

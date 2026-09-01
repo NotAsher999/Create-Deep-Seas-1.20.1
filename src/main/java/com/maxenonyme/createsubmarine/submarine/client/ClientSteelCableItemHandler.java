@@ -6,6 +6,7 @@ import dev.simulated_team.simulated.content.blocks.rope.RopeStrandHolderBehavior
 import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBlockEntity;
 import dev.simulated_team.simulated.content.items.rope.RopeItem.RopeItem;
 import dev.simulated_team.simulated.index.SimDataComponents;
+import dev.simulated_team.simulated.compat.components.ItemComponentCompat;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.outliner.Outliner;
@@ -21,6 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.TickEvent;
 
 public class ClientSteelCableItemHandler {
     public static void tick() {
@@ -38,10 +40,10 @@ public class ClientSteelCableItemHandler {
             if (!heldItem.is(com.maxenonyme.createsubmarine.CreateSubmarine.STEEL_CABLE.get()))
                 continue;
 
-            if (!heldItem.has(SimDataComponents.ROPE_FIRST_CONNECTION))
+            if (!ItemComponentCompat.has(heldItem, SimDataComponents.ROPE_FIRST_CONNECTION))
                 continue;
 
-            final BlockPos firstBlock = heldItem.get(SimDataComponents.ROPE_FIRST_CONNECTION);
+            final BlockPos firstBlock = ItemComponentCompat.get(heldItem, SimDataComponents.ROPE_FIRST_CONNECTION);
             final HitResult rayTrace = Minecraft.getInstance().hitResult;
 
             if (rayTrace instanceof final BlockHitResult hitResult) {
@@ -114,7 +116,9 @@ public class ClientSteelCableItemHandler {
         }
     }
 
-    public static void onClientTick(net.neoforged.neoforge.client.event.ClientTickEvent.Post event) {
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         tick();
         tickPlayerCollision();
     }
@@ -260,7 +264,7 @@ public class ClientSteelCableItemHandler {
             return new org.joml.Vector3d(a);
         }
         double t = ap.dot(ab) / abLenSq;
-        t = Math.clamp(t, 0.0, 1.0);
+        t = net.minecraft.util.Mth.clamp(t, 0.0, 1.0);
         return new org.joml.Vector3d(a).add(ab.mul(t));
     }
 }

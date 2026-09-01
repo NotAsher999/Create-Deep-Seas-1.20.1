@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,14 +51,14 @@ public class SubmarineClientState {
     }
 
     public static boolean hasSeenWelcomeScreen() {
-        if (!net.neoforged.fml.loading.FMLEnvironment.production && SubmarineConfig.WELCOME_SCREEN_SEEN != null) {
+        if (!net.minecraftforge.fml.loading.FMLEnvironment.production && SubmarineConfig.WELCOME_SCREEN_SEEN != null) {
             return SubmarineConfig.WELCOME_SCREEN_SEEN.get();
         }
         return welcomeScreenSeen;
     }
 
     public static void setWelcomeScreenSeen(boolean seen) {
-        if (!net.neoforged.fml.loading.FMLEnvironment.production && SubmarineConfig.WELCOME_SCREEN_SEEN != null) {
+        if (!net.minecraftforge.fml.loading.FMLEnvironment.production && SubmarineConfig.WELCOME_SCREEN_SEEN != null) {
             SubmarineConfig.WELCOME_SCREEN_SEEN.set(seen);
             SubmarineConfig.WELCOME_SCREEN_SEEN.save();
         } else {
@@ -77,14 +77,14 @@ public class SubmarineClientState {
     }
 
     public static String getIgnoredUpdateVersion() {
-        if (!net.neoforged.fml.loading.FMLEnvironment.production && SubmarineConfig.IGNORED_UPDATE_VERSION != null) {
+        if (!net.minecraftforge.fml.loading.FMLEnvironment.production && SubmarineConfig.IGNORED_UPDATE_VERSION != null) {
             return SubmarineConfig.IGNORED_UPDATE_VERSION.get();
         }
         return ignoredUpdateVersion;
     }
 
     public static void setIgnoredUpdateVersion(String version) {
-        if (!net.neoforged.fml.loading.FMLEnvironment.production && SubmarineConfig.IGNORED_UPDATE_VERSION != null) {
+        if (!net.minecraftforge.fml.loading.FMLEnvironment.production && SubmarineConfig.IGNORED_UPDATE_VERSION != null) {
             SubmarineConfig.IGNORED_UPDATE_VERSION.set(version);
             SubmarineConfig.IGNORED_UPDATE_VERSION.save();
         } else {

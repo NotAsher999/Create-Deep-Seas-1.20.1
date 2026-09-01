@@ -26,7 +26,7 @@ public class BarometerItemRenderer extends BlockEntityWithoutLevelRenderer {
         }
 
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
-        blockRenderer.renderSingleBlock(CreateSubmarine.BAROMETER.get().defaultBlockState(), ms, buffer, light, overlay, net.neoforged.neoforge.client.model.data.ModelData.EMPTY, null);
+        blockRenderer.renderSingleBlock(CreateSubmarine.BAROMETER.get().defaultBlockState(), ms, buffer, light, overlay, net.minecraftforge.client.model.data.ModelData.EMPTY, null);
 
         Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(dummyBE, ms, buffer, light, overlay);
     }

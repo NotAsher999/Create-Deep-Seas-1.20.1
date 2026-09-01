@@ -1,47 +1,31 @@
 package com.maxenonyme.createsubmarine.submarine.network;
 
-import com.maxenonyme.createsubmarine.CreateSubmarine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
-public record SubCrackPayload(UUID subId, BlockPos plotPos, int crackLevel, int blockId) implements CustomPacketPayload {
-    public static final Type<SubCrackPayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "sub_crack"));
-
-    public static final StreamCodec<FriendlyByteBuf, SubCrackPayload> CODEC = CustomPacketPayload.codec(
-            SubCrackPayload::write, SubCrackPayload::new);
-
-    public SubCrackPayload(FriendlyByteBuf buf) {
-        this(buf.readUUID(), buf.readBlockPos(), buf.readInt(), buf.readInt());
+public record SubCrackPayload(UUID subId, BlockPos plotPos, int crackLevel, int blockId) {
+    public static void encode(SubCrackPayload payload, FriendlyByteBuf buf) {
+        buf.writeUUID(payload.subId());
+        buf.writeBlockPos(payload.plotPos());
+        buf.writeInt(payload.crackLevel());
+        buf.writeInt(payload.blockId());
     }
 
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUUID(subId);
-        buf.writeBlockPos(plotPos);
-        buf.writeInt(crackLevel);
-        buf.writeInt(blockId);
+    public static SubCrackPayload decode(FriendlyByteBuf buf) {
+        return new SubCrackPayload(buf.readUUID(), buf.readBlockPos(), buf.readInt(), buf.readInt());
     }
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static void handle(SubCrackPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        context.enqueueWork(() -> ClientHandler.handle(payload));
+        context.setPacketHandled(true);
     }
 
-    public static void handle(SubCrackPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
-                ClientHandler.handle(payload);
-            }
-        });
-    }
-
-    private static class ClientHandler {
+    private static final class ClientHandler {
         private static void handle(SubCrackPayload payload) {
             com.maxenonyme.createsubmarine.submarine.client.SubLevelCrackRenderer.updateCrack(
                     payload.subId(), payload.plotPos(), payload.crackLevel(), payload.blockId());

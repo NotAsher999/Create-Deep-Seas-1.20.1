@@ -1,5 +1,5 @@
 {
-  "loader": "neoforge:obj",
+  "loader": "forge:obj",
   "model": "create_submarine:models/block/underwater_mine.obj",
   "flip_v": true,
   "textures": {

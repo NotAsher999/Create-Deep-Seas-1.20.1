@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class CookiecutterSharkRenderer extends MobRenderer<CookiecutterSharkEntity, CookiecutterShark<CookiecutterSharkEntity>> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(CreateAbyss.MOD_ID, "textures/entity/cookiecutter_shark_texture.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(CreateAbyss.MOD_ID, "textures/entity/cookiecutter_shark_texture.png");
 
     public CookiecutterSharkRenderer(EntityRendererProvider.Context context) {
         super(context, new CookiecutterShark<>(context.bakeLayer(CookiecutterShark.LAYER_LOCATION)), 0.4F);

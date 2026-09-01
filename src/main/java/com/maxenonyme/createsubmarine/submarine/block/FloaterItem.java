@@ -16,7 +16,7 @@ public class FloaterItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
             tooltipComponents.add(Component.empty());
             BallastTankItem.addTranslatableLines(tooltipComponents, "item.create_submarine.floater.tooltip.summary", 0xEBC255);
@@ -25,6 +25,6 @@ public class FloaterItem extends BlockItem {
                 Component.translatable("create_submarine.tooltip.keyShift").withStyle(ChatFormatting.GRAY))
                 .withStyle(ChatFormatting.DARK_GRAY));
         }
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 }

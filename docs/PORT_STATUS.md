@@ -3,45 +3,49 @@
 ## Current checkpoint
 
 - Branch: `port/forge-1.20.1`
-- Source baseline: `37b876cea7e06e6a3ea56fce998aff9c4a0d3984`
+- Upstream source baseline: `37b876cea7e06e6a3ea56fce998aff9c4a0d3984`
 - Target: Minecraft 1.20.1, Forge 47.4.0, Java 17
-- Upstream version: Create Deep Seas 2.2.3
-- Port version: not assigned
-- Original matching JAR: not supplied
-- State: baseline and dependency audit in progress; no ported build claimed
+- Upstream version: 2.2.3
+- Port version: `2.2.3-port.1`
+- Source/JAR correspondence: unavailable; no matching upstream 2.2.3 JAR was supplied
+- State: implementation and production-runtime checkpoint complete; public binary distribution remains unauthorized
 
 ## System matrix
 
-| System | State | Evidence | Next gate |
+| System | State | Evidence | Boundary |
 | --- | --- | --- | --- |
-| Source baseline | Locked | Fork and upstream `main` both at `37b876c` | Preserve baseline ref and record later upstream changes |
-| Forge workspace | Not started | Current build is NeoForge 1.21.1 / Java 21 | Establish Forge 47.4.0 / Java 17 build without changing behavior |
-| Registries and entrypoints | Mapped | Three Mod IDs and all registry families identified | Compile and verify every original ID |
-| Blocks/items/machines | Mapped | Ballast, pressure, oxygen, cable, mine, propeller and display systems present | Port full block/block-entity/capability chains |
-| Sable physics | Mapped, not ported | 56 files import Sable; forces, sublevels and Rapier internals are used | Match formal 2.0.5-port.1 source/API behavior |
-| Simulated ropes | Mapped, not ported | 61 imports across rope behavior, constraints and renderers | Match formal 1.3.1-port.1 behavior and persistence |
-| Networking | Mapped, not ported | Seven 1.21 custom payloads | Direction-locked SimpleChannel implementation and tests |
-| Client rendering | High risk, not ported | 27 client Mixins plus Veil/Sodium/Flywheel paths | Embeddium/Oculus/Veil compatibility matrix and visual validation |
-| Abyss | Upstream WIP | Upstream constructor disables content in production | Preserve policy; compile and dev-test entities/worldgen/persistence |
-| High Seas | Upstream placeholder | Empty entrypoint plus experimental water culling code | Preserve current behavior without inventing content |
-| Packaging/recovery | Not started | Existing project has no port release script | Add after a stable compiled checkpoint |
+| Build/lifecycle | Complete | ModDevGradle LegacyForge 2.0.107, Gradle 8.14.3, Java 17; clean `build` passes | Five ignored local dependency JARs are required and hash-locked |
+| Entrypoints/registries | Complete | One artifact retains all three Mod IDs; Forge registries and lifecycle events initialize in client/server runs | Abyss production disable and High Seas placeholder remain upstream behavior |
+| Blocks/items/machines | Ported | Original registration chains compile; recipes, loot, tags, models and item-stack schemas are migrated | Exhaustive manual interaction of every block is not represented as an automated test |
+| Capabilities | Ported | Forge `LazyOptional` fluid/energy providers, side rules and invalidation restored | Representative machine transfer gameplay remains a manual acceptance surface |
+| Networking | Complete | Seven direction-locked `SimpleChannel` messages; codec and registration tests pass | Tests cover framing/direction/bounds, not adverse real-network latency |
+| Sable physics | Runtime pass | Updated formal Sable accepts addon force-group entries; PJ client/server sublevels initialize, reload and save | Full submarine assembly/pressure campaign remains gameplay-level validation |
+| Simulated ropes | Runtime pass | External Mixin contracts are hash/bytecode locked; production PJ no longer reports rope redirect failure | Steel-cable break/drop/electrification scenarios remain manual gameplay checks |
+| Rendering | Runtime pass | Vanilla and Embeddium routes are selected explicitly; Veil loads 22 Deep Seas shaders before and after F3+T | Shader packs were disabled in the recorded PJ run |
+| Copycats | Compatibility pass | Exact 3.0.4 ABI test plus isolated Copycats and Copycats+Embeddium client, and Copycats server bootstrap | PJ production run did not have Copycats installed |
+| Embeddium/Oculus | Runtime pass | Exact Embeddium 0.3.31 contracts; PJ world/save/reload with Embeddium+Oculus succeeds | Named-dev Oculus cannot run because Oculus's own SRG refmap targets production names |
+| Persistence/shutdown | Runtime pass | PJ saved overworld, Nether, End and all Sable sublevels, returned to title, then shut down cleanly | Save upgrade from an original 1.21 world is not a supported cross-version path |
+| Packaging/recovery | Complete | One-click script, dependency verification, source ZIP, minimal workspace, Git bundle and SHA-256 manifests | Public compiled publication is blocked by ARR license |
 
-## Missing evidence
+## Upstream behavior intentionally preserved
 
-- A matching original 2.2.3 release JAR has not been supplied.
-- Exact 1.20.1 Lithostitched, Fusion, Copycats and Embeddium/Oculus artifacts
-  have not yet been locked for this project.
-- No Forge 1.20.1 compilation or runtime result exists yet.
-- The license permits contribution proposals in the README, but compiled public
-  redistribution still requires separate authorization.
+- `create_abyss` returns early in production; the source and resources remain in
+  the artifact but the port does not turn WIP content into a claimed release.
+- `create_high_seas` remains a placeholder.
+- Decompression chambers and boat support retain their upstream WIP boundaries.
+- No feature was disabled, stubbed or replaced with a constant merely to make
+  Forge compilation or startup succeed.
 
-## Immediate route
+## Known risks and follow-up acceptance
 
-1. Lock exact formal dependency artifacts and hashes.
-2. Replace the build/lifecycle layer and obtain the first complete compile-error
-   inventory.
-3. Restore registries, capabilities and networking as complete vertical chains.
-4. Port Sable/Simulated physics and persistence against their actual formal
-   1.20.1 sources.
-5. Port client rendering last, then validate client, dedicated server, saves and
-   the full PJ multi-mod stack.
+- Run an extended gameplay session that assembles and drives a Deep Seas
+  submarine, exercises ballast/pressure/sinking, steel cable, mine, propeller,
+  electrolyzer and save/reload behavior together.
+- Repeat the production visual pass with Copycats installed and with an Oculus
+  shader pack enabled.
+- If a matching upstream 2.2.3 JAR becomes available, perform the deferred
+  source/binary correspondence audit without moving the locked baseline first.
+
+These are explicit behavior-coverage boundaries, not hidden compile gaps. The
+current checkpoint remains buildable and recoverable while further acceptance
+evidence is collected.

@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import net.minecraft.SharedConstants;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -47,7 +47,7 @@ public final class UpdateChecker {
                 .thenApply(HttpResponse::body)
                 .thenAccept(body -> {
                     try {
-                        JsonArray versions = JsonParser.parseString(body).getAsJsonArray();
+                        JsonArray versions = new JsonParser().parse(body).getAsJsonArray();
                         for (JsonElement element : versions) {
                             JsonObject versionObj = element.getAsJsonObject();
                             if (!"listed".equalsIgnoreCase(versionObj.get("status").getAsString())) {
@@ -167,7 +167,7 @@ public final class UpdateChecker {
                 .thenApply(HttpResponse::body)
                 .thenAccept(body -> {
                     try {
-                        JsonArray versions = JsonParser.parseString(body).getAsJsonArray();
+                        JsonArray versions = new JsonParser().parse(body).getAsJsonArray();
                         for (JsonElement element : versions) {
                             JsonObject versionObj = element.getAsJsonObject();
                             if (!"listed".equalsIgnoreCase(versionObj.get("status").getAsString())) continue;

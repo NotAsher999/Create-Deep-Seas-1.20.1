@@ -18,8 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = FluidRenderHelper.class, remap = false)
 public class FluidRenderHelperMixin {
 
-    @ModifyVariable(method = {"renderFluidBox", "renderFluidStack"}, at = @At("HEAD"), argsOnly = true)
-    private static MultiBufferSource createsubmarine$forceEntityTranslucent(MultiBufferSource buffer) {
+    @ModifyVariable(method = {
+            "renderFluidBox(Lnet/minecraft/world/level/material/FluidState;FFFFFFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;IZZ)V",
+            "renderFluidBox(Ljava/lang/Object;FFFFFFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;IZZ)V"
+    }, at = @At("HEAD"), argsOnly = true)
+    private MultiBufferSource createsubmarine$forceEntityTranslucent(MultiBufferSource buffer) {
         if (!SubmarineWaterCullBuffer.isRenderingSubmarineFluid()) return buffer;
         return type -> {
             String typeStr = type.toString();
@@ -33,12 +36,13 @@ public class FluidRenderHelperMixin {
     @Inject(method = "putVertex", at = @At("HEAD"), cancellable = true)
     private static void createsubmarine$injectOverlay(VertexConsumer vc, PoseStack ms, float x, float y, float z, int color, float u, float v, Direction face, int light, CallbackInfo ci) {
         if (!SubmarineWaterCullBuffer.isRenderingSubmarineFluid()) return;
-        vc.addVertex(ms.last().pose(), x, y, z)
-          .setColor(color)
-          .setUv(u, v)
-          .setOverlay(OverlayTexture.NO_OVERLAY)
-          .setLight(light)
-          .setNormal(face.getStepX(), face.getStepY(), face.getStepZ());
+        vc.vertex(ms.last().pose(), x, y, z)
+          .color(color)
+          .uv(u, v)
+          .overlayCoords(OverlayTexture.NO_OVERLAY)
+          .uv2(light)
+          .normal(face.getStepX(), face.getStepY(), face.getStepZ())
+          .endVertex();
         ci.cancel();
     }
 }

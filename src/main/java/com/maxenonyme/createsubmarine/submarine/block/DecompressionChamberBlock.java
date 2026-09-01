@@ -15,16 +15,8 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import com.mojang.serialization.MapCodec;
 
 public class DecompressionChamberBlock extends DirectionalBlock implements EntityBlock {
-
-    public static final MapCodec<DecompressionChamberBlock> CODEC = simpleCodec(DecompressionChamberBlock::new);
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
-    }
 
     public DecompressionChamberBlock(Properties props) {
         super(props);

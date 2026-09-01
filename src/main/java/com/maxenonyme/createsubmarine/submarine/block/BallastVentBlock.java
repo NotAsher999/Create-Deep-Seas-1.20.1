@@ -18,8 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 public class BallastVentBlock extends HorizontalKineticBlock implements EntityBlock {
     public static final BooleanProperty UP = BlockStateProperties.UP;
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
@@ -62,7 +60,7 @@ public class BallastVentBlock extends HorizontalKineticBlock implements EntityBl
         return computeConnections(base, context.getLevel(), context.getClickedPos());
     }
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         if (!isPipeConnectionFace(updated, direction)) {
             return updated.setValue(propertyForDirection(direction), false);
@@ -89,8 +87,9 @@ public class BallastVentBlock extends HorizontalKineticBlock implements EntityBl
         BlockEntity be = level.getBlockEntity(neighborPos);
         if (be == null) return false;
         if (be.getLevel() == null) return false;
-        IFluidHandler handler = be.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, faceTowardsNeighbor.getOpposite());
-        return handler != null;
+        return be.getCapability(
+                net.minecraftforge.common.capabilities.ForgeCapabilities.FLUID_HANDLER,
+                faceTowardsNeighbor.getOpposite()).isPresent();
     }
     public static BooleanProperty propertyForDirection(Direction dir) {
         return switch (dir) {

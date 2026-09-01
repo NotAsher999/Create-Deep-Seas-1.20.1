@@ -11,11 +11,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import java.util.List;
 
 public class PDAManager {
@@ -28,7 +28,7 @@ public class PDAManager {
         SLIDE_OUT
     }
 
-    private static final ResourceLocation PDA_TEXTURE = ResourceLocation.fromNamespaceAndPath("create_abyss",
+    private static final ResourceLocation PDA_TEXTURE = new ResourceLocation("create_abyss",
             "textures/gui/pda.png");
     private static final int BOX_WIDTH = 240;
     private static final int BOX_HEIGHT = 60;
@@ -195,7 +195,7 @@ public class PDAManager {
             if (roarDelayTicks == 0) {
                 mc.level.playLocalSound(mc.player.getX(), mc.player.getY(), mc.player.getZ(),
                         net.minecraft.sounds.SoundEvent.createVariableRangeEvent(
-                                ResourceLocation.fromNamespaceAndPath("create_abyss", "reaper_leviathan_roars")),
+                                new ResourceLocation("create_abyss", "reaper_leviathan_roars")),
                         net.minecraft.sounds.SoundSource.HOSTILE, 0.5F, 1.0F, false);
             }
         }
@@ -264,18 +264,19 @@ public class PDAManager {
 
     public static class ModEvents {
         @SubscribeEvent
-        public static void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
+        public static void onRegisterGuiLayers(RegisterGuiOverlaysEvent event) {
             event.registerAbove(
-                    VanillaGuiLayers.HOTBAR,
-                    ResourceLocation.fromNamespaceAndPath("create_abyss", "pda"),
-                    (guiGraphics, partialTick) -> PDAManager.renderOverlay(guiGraphics,
-                            partialTick.getGameTimeDeltaTicks()));
+                    VanillaGuiOverlay.HOTBAR.id(),
+                    "pda",
+                    (forgeGui, guiGraphics, partialTick, width, height) ->
+                            PDAManager.renderOverlay(guiGraphics, partialTick));
         }
     }
 
     public static class GameEvents {
         @SubscribeEvent
-        public static void onClientTick(ClientTickEvent.Post event) {
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.END) return;
             PDAManager.tick();
         }
 
@@ -286,14 +287,14 @@ public class PDAManager {
                             .then(Commands.argument("message", StringArgumentType.greedyString())
                                     .executes(context -> {
                                         String message = StringArgumentType.getString(context, "message");
-                                        PDAManager.queuePDACommand(message, ResourceLocation.fromNamespaceAndPath(
+                                        PDAManager.queuePDACommand(message, new ResourceLocation(
                                                 "create_abyss", "leviathan_class_detected"), 6800, 100);
                                         return 1;
                                     }))
                             .executes(context -> {
                                 PDAManager.queuePDACommand(
                                         "Detecting multiple leviathan class organisms in the region. Are you certain whatever you're doing is worth it?",
-                                        ResourceLocation.fromNamespaceAndPath("create_abyss",
+                                        new ResourceLocation("create_abyss",
                                                 "leviathan_class_detected"),
                                         6800, 100);
                                 return 1;

@@ -1,42 +1,27 @@
 package com.maxenonyme.createsubmarine.submarine.network;
 
-import com.maxenonyme.createsubmarine.CreateSubmarine;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
-public record CameraShakePayload(float intensity, int ticks) implements CustomPacketPayload {
-    public static final Type<CameraShakePayload> TYPE = new Type<>(
-            ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "camera_shake"));
+import java.util.function.Supplier;
 
-    public static final StreamCodec<FriendlyByteBuf, CameraShakePayload> CODEC = CustomPacketPayload.codec(
-            CameraShakePayload::write, CameraShakePayload::new);
-
-    public CameraShakePayload(FriendlyByteBuf buf) {
-        this(buf.readFloat(), buf.readInt());
+public record CameraShakePayload(float intensity, int ticks) {
+    public static void encode(CameraShakePayload payload, FriendlyByteBuf buf) {
+        buf.writeFloat(payload.intensity());
+        buf.writeInt(payload.ticks());
     }
 
-    public void write(FriendlyByteBuf buf) {
-        buf.writeFloat(intensity);
-        buf.writeInt(ticks);
+    public static CameraShakePayload decode(FriendlyByteBuf buf) {
+        return new CameraShakePayload(buf.readFloat(), buf.readInt());
     }
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static void handle(CameraShakePayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        context.enqueueWork(() -> ClientHandler.handle(payload));
+        context.setPacketHandled(true);
     }
 
-    public static void handle(CameraShakePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
-                ClientHandler.handle(payload);
-            }
-        });
-    }
-
-    private static class ClientHandler {
+    private static final class ClientHandler {
         private static void handle(CameraShakePayload payload) {
             com.maxenonyme.AbyssDimension.client.CameraShake.shake(payload.intensity(), payload.ticks());
         }

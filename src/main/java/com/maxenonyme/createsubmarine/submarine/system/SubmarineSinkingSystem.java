@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Vector3d;
 import java.util.Queue;
 import java.util.Random;
@@ -38,7 +38,9 @@ public class SubmarineSinkingSystem {
         return CRASHED.contains(id);
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         long currentTick = event.getServer().getTickCount();
         PENDING.removeIf(removal -> {
             if (currentTick < removal.tick())

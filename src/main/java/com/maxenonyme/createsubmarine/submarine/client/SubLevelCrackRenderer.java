@@ -13,10 +13,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.Map;
@@ -92,7 +92,7 @@ public class SubLevelCrackRenderer {
                 if (crackLevel == 1) stage = 2;
                 else if (crackLevel == 2) stage = 5;
                 else if (crackLevel >= 3) stage = 8;
-                ResourceLocation tex = ResourceLocation.withDefaultNamespace(
+                ResourceLocation tex = new ResourceLocation(
                         "textures/block/destroy_stage_" + stage + ".png");
 
                 BlockState state = mc.level.getBlockState(plotPos);
@@ -118,7 +118,7 @@ public class SubLevelCrackRenderer {
         }
 
         for (int s = 0; s <= 9; s++) {
-            ResourceLocation tex = ResourceLocation.withDefaultNamespace(
+            ResourceLocation tex = new ResourceLocation(
                     "textures/block/destroy_stage_" + s + ".png");
             bufferSource.endBatch(RenderType.entityTranslucent(tex));
         }
@@ -148,11 +148,12 @@ public class SubLevelCrackRenderer {
     private static void vert(VertexConsumer v, Matrix4f mat,
             float x, float y, float z, float u, float w,
             float nx, float ny, float nz) {
-        v.addVertex(mat, x, y, z)
-                .setColor(-1)
-                .setUv(u, w)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(nx, ny, nz);
+        v.vertex(mat, x, y, z)
+                .color(-1)
+                .uv(u, w)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .normal(nx, ny, nz)
+                .endVertex();
     }
 }

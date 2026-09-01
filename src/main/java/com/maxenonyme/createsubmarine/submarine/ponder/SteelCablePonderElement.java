@@ -91,7 +91,7 @@ public class SteelCablePonderElement extends RopeStrandElement {
             middle.light(worldLight).renderInto(ps, vb);
             ps.popPose();
 
-            if (renderPoint1 == renderPoints.getLast()) {
+            if (renderPoint1 == renderPoints.get(renderPoints.size() - 1)) {
                 ps.translate(0, length, 0);
                 knot.light(worldLight).renderInto(ps, vb);
             }
@@ -104,8 +104,8 @@ public class SteelCablePonderElement extends RopeStrandElement {
         final ObjectArrayList<RopeStrandRenderer.RopeRenderPoint> ropeRenderPoints = new ObjectArrayList<>();
         final ObjectArrayList<Vector3d> points = new ObjectArrayList<>(inputPoints);
 
-        while (points.size() >= 2 && points.getFirst().distanceSquared(points.get(1)) < 1e-6) {
-            points.removeFirst();
+        while (points.size() >= 2 && points.get(0).distanceSquared(points.get(1)) < 1e-6) {
+            points.remove(0);
         }
         if (points.size() <= 1) return new ObjectArrayList<>();
 
@@ -139,7 +139,7 @@ public class SteelCablePonderElement extends RopeStrandElement {
             normal.set(runningNormal);
         }
 
-        ropeRenderPoints.add(new RopeStrandRenderer.RopeRenderPoint(new Quaternionf(runningRotation), points.getLast()));
+        ropeRenderPoints.add(new RopeStrandRenderer.RopeRenderPoint(new Quaternionf(runningRotation), points.get(points.size() - 1)));
         return ropeRenderPoints;
     }
 }

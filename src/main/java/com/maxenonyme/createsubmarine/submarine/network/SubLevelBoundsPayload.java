@@ -1,33 +1,26 @@
 package com.maxenonyme.createsubmarine.submarine.network;
+
 import com.maxenonyme.createsubmarine.submarine.util.SubLevelRegistry;
-import com.maxenonyme.createsubmarine.CreateSubmarine;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
 import java.util.UUID;
-public record SubLevelBoundsPayload(UUID id, int minY, int maxY) implements CustomPacketPayload {
-    public static final Type<SubLevelBoundsPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "bounds_sync"));
-    public static final StreamCodec<FriendlyByteBuf, SubLevelBoundsPayload> CODEC = CustomPacketPayload.codec(
-        SubLevelBoundsPayload::write,
-        SubLevelBoundsPayload::new
-    );
-    public SubLevelBoundsPayload(FriendlyByteBuf buffer) {
-        this(buffer.readUUID(), buffer.readInt(), buffer.readInt());
+import java.util.function.Supplier;
+
+public record SubLevelBoundsPayload(UUID id, int minY, int maxY) {
+    public static void encode(SubLevelBoundsPayload payload, FriendlyByteBuf buf) {
+        buf.writeUUID(payload.id());
+        buf.writeInt(payload.minY());
+        buf.writeInt(payload.maxY());
     }
-    public void write(FriendlyByteBuf buffer) {
-        buffer.writeUUID(id);
-        buffer.writeInt(minY);
-        buffer.writeInt(maxY);
+
+    public static SubLevelBoundsPayload decode(FriendlyByteBuf buf) {
+        return new SubLevelBoundsPayload(buf.readUUID(), buf.readInt(), buf.readInt());
     }
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-    public static void handle(final SubLevelBoundsPayload payload, final IPayloadContext context) {
-        context.enqueueWork(() -> {
-            SubLevelRegistry.updateBounds(payload.id(), payload.minY(), payload.maxY());
-        });
+
+    public static void handle(SubLevelBoundsPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        context.enqueueWork(() -> SubLevelRegistry.updateBounds(payload.id(), payload.minY(), payload.maxY()));
+        context.setPacketHandled(true);
     }
 }

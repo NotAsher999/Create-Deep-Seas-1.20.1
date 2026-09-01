@@ -1,37 +1,33 @@
 package com.maxenonyme.createsubmarine.submarine.network;
 
-import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.block.entity.ElectrolyzerBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
-public record ElectrolyzerTogglePayload(BlockPos pos) implements CustomPacketPayload {
-    public static final Type<ElectrolyzerTogglePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "electrolyzer_toggle"));
+import java.util.function.Supplier;
 
-    public static final StreamCodec<FriendlyByteBuf, ElectrolyzerTogglePayload> CODEC = StreamCodec.of(
-        (buf, payload) -> buf.writeBlockPos(payload.pos()),
-        buf -> new ElectrolyzerTogglePayload(buf.readBlockPos())
-    );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+public record ElectrolyzerTogglePayload(BlockPos pos) {
+    public static void encode(ElectrolyzerTogglePayload payload, FriendlyByteBuf buf) {
+        buf.writeBlockPos(payload.pos());
     }
 
-    public static void handle(final ElectrolyzerTogglePayload payload, final IPayloadContext context) {
+    public static ElectrolyzerTogglePayload decode(FriendlyByteBuf buf) {
+        return new ElectrolyzerTogglePayload(buf.readBlockPos());
+    }
+
+    public static void handle(ElectrolyzerTogglePayload payload,
+                              Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            var player = context.player();
+            var player = context.getSender();
             if (player == null) return;
-            BlockPos pos = payload.pos();
-            if (player.containerMenu instanceof com.maxenonyme.createsubmarine.submarine.gui.ElectrolyzerMenu menu && menu.pos.equals(payload.pos())) {
-                if (player.level().getBlockEntity(payload.pos()) instanceof ElectrolyzerBlockEntity be) {
-                    be.toggleEnabled();
-                }
+            if (player.containerMenu instanceof com.maxenonyme.createsubmarine.submarine.gui.ElectrolyzerMenu menu
+                    && menu.pos.equals(payload.pos())
+                    && player.level().getBlockEntity(payload.pos()) instanceof ElectrolyzerBlockEntity be) {
+                be.toggleEnabled();
             }
         });
+        context.setPacketHandled(true);
     }
 }

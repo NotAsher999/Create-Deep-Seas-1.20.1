@@ -1,7 +1,7 @@
 package com.maxenonyme.createsubmarine.submarine.mixin.compat.sable;
 
 import com.mojang.blaze3d.shaders.Uniform;
-import dev.ryanhcode.sable.render.water_occlusion.WaterOcclusionRenderer;
+import com.maxenonyme.createsubmarine.submarine.client.renderer.WaterOcclusionRenderer;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.render.dispatcher.VanillaSubLevelRenderDispatcher;
 import net.minecraft.client.renderer.RenderType;

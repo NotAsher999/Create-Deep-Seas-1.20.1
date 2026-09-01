@@ -32,9 +32,8 @@ public class RopeConnectorRendererMixin {
         Direction direction,
         RopeConnectorBlockEntity be
     ) {
-        if (model == SimPartialModels.ROPE_CONNECTOR_KNOT
-                && be instanceof SmartBlockEntity smartBe) {
-            RopeStrandHolderBehavior behavior = smartBe.getBehaviour(RopeStrandHolderBehavior.TYPE);
+        if (model == SimPartialModels.ROPE_CONNECTOR_KNOT) {
+            RopeStrandHolderBehavior behavior = be.getBehaviour(RopeStrandHolderBehavior.TYPE);
             if (behavior instanceof SteelCableHolderAccessor accessor && accessor.createsubmarine$isSteelCable()) {
                 return CachedBuffers.partialFacing(AllPartialModels.CONNECTOR_STEEL_KNOT, state, direction);
             }

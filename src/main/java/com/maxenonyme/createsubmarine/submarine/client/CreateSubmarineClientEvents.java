@@ -1,9 +1,9 @@
 package com.maxenonyme.createsubmarine.submarine.client;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.config.HullStrengthConfig;
 import net.minecraft.world.item.BlockItem;
@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.Minecraft;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
+import net.minecraft.world.entity.player.Player;
 
 @EventBusSubscriber(modid = CreateSubmarine.MOD_ID, value = Dist.CLIENT)
 public class CreateSubmarineClientEvents {
@@ -23,8 +24,8 @@ public class CreateSubmarineClientEvents {
     public static void onTooltip(ItemTooltipEvent event) {
         if (event.getEntity() == null)
             return;
-        if (!(event.getEntity() instanceof Player player) || !GogglesItem.isWearingGoggles(player))
-            return;
+        Player player = event.getEntity();
+        if (!GogglesItem.isWearingGoggles(player))
             return;
 
         if (event.getItemStack().getItem() instanceof BlockItem blockItem) {

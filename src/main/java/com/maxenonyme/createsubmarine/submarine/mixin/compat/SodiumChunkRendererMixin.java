@@ -11,13 +11,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.lang.reflect.Field;
 
 @Pseudo
-@Mixin(targets = "net.caffeinemc.mods.sodium.client.render.chunk.ShaderChunkRenderer", remap = false)
+@Mixin(targets = "me.jellysquid.mods.sodium.client.render.chunk.ShaderChunkRenderer", remap = false)
 public abstract class SodiumChunkRendererMixin {
 
     private static Field createsubmarine$activeProgramField;
     private static boolean createsubmarine$lookupFailed;
 
-    @Inject(method = "begin", at = @At("TAIL"), remap = false, require = 0)
+    @Inject(
+            method = "begin(Lme/jellysquid/mods/sodium/client/render/chunk/terrain/TerrainRenderPass;)V",
+            at = @At("TAIL"),
+            remap = false)
     private void createsubmarine$applyOcclusionUniforms(@Coerce Object pass, CallbackInfo ci) {
         if (createsubmarine$lookupFailed) return;
         try {
@@ -34,7 +37,9 @@ public abstract class SodiumChunkRendererMixin {
             Object program = field.get(this);
             if (program == null) return;
             int handle = (int) program.getClass().getMethod("handle").invoke(program);
-            boolean translucent = (boolean) pass.getClass().getMethod("isTranslucent").invoke(pass);
+            // Embeddium 0.3.31 represents the translucent terrain pass as the
+            // sole reverse-order pass. Sodium 0.6 exposes this as isTranslucent().
+            boolean translucent = (boolean) pass.getClass().getMethod("isReverseOrder").invoke(pass);
             SodiumWaterOcclusionBridge.applyToProgram(handle, translucent);
         } catch (ReflectiveOperationException e) {
             createsubmarine$lookupFailed = true;

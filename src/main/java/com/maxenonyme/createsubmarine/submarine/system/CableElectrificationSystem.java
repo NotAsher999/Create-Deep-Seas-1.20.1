@@ -6,7 +6,7 @@ import dev.ryanhcode.sable.companion.SubLevelAccess;
 import dev.simulated_team.simulated.content.blocks.rope.RopeStrandHolderBehavior;
 import dev.simulated_team.simulated.content.blocks.rope.rope_winch.RopeWinchBlockEntity;
 import dev.simulated_team.simulated.content.blocks.rope.rope_connector.RopeConnectorBlockEntity;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import dev.simulated_team.simulated.content.blocks.rope.strand.server.RopeAttachment;
 import dev.simulated_team.simulated.content.blocks.rope.strand.server.RopeAttachmentPoint;
 import dev.simulated_team.simulated.content.blocks.rope.strand.server.ServerLevelRopeManager;
@@ -19,8 +19,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Vector3d;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -52,7 +52,9 @@ public class CableElectrificationSystem {
         return WINCH_ENERGY.computeIfAbsent(be, k -> new ElectrifiedEnergyStorage(FE_CAPACITY));
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+
+        if (event.phase != TickEvent.Phase.END) return;
         tickCounter++;
 
         for (ServerLevel serverLevel : event.getServer().getAllLevels()) {
@@ -168,12 +170,9 @@ public class CableElectrificationSystem {
             if (adjBE == null)
                 continue;
 
-            IEnergyStorage adjStorage = level.getCapability(
-                    net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
-                    adjPos,
-                    level.getBlockState(adjPos),
-                    adjBE,
-                    dir.getOpposite());
+            IEnergyStorage adjStorage = adjBE.getCapability(
+                    net.minecraftforge.common.capabilities.ForgeCapabilities.ENERGY,
+                    dir.getOpposite()).orElse(null);
             if (adjStorage == null)
                 continue;
 
@@ -339,7 +338,7 @@ public class CableElectrificationSystem {
     private static Vector3d getClosestPoint(Vector3d a, Vector3d b, Vector3d p) {
         Vector3d ab = new Vector3d(b).sub(a);
         double t = new Vector3d(p).sub(a).dot(ab) / ab.lengthSquared();
-        t = Math.clamp(t, 0.0, 1.0);
+        t = net.minecraft.util.Mth.clamp(t, 0.0, 1.0);
         return new Vector3d(a).add(new Vector3d(ab).mul(t));
     }
 

@@ -8,7 +8,6 @@ import dev.simulated_team.simulated.content.blocks.rope.strand.server.RopeAttach
 import dev.simulated_team.simulated.content.blocks.rope.strand.server.RopeAttachmentPoint;
 import dev.simulated_team.simulated.content.blocks.rope.RopeHolderBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -68,12 +67,12 @@ public class RopeStrandHolderBehaviorMixin implements SteelCableHolderAccessor {
     }
 
     @Inject(method = "write", at = @At("TAIL"))
-    private void createsubmarine$write(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    private void createsubmarine$write(CompoundTag nbt, boolean clientPacket, CallbackInfo ci) {
         nbt.putBoolean("createsubmarine$IsSteelCable", this.createsubmarine$isSteelCable);
     }
 
     @Inject(method = "read", at = @At("TAIL"))
-    private void createsubmarine$read(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    private void createsubmarine$read(CompoundTag nbt, boolean clientPacket, CallbackInfo ci) {
         this.createsubmarine$isSteelCable = nbt.getBoolean("createsubmarine$IsSteelCable");
         if (this.createsubmarine$isSteelCable) {
             if (this.ownedClientStrand instanceof SteelCableHolderAccessor accessor) {
@@ -117,7 +116,11 @@ public class RopeStrandHolderBehaviorMixin implements SteelCableHolderAccessor {
         return new ItemStack(item);
     }
 
-    @Redirect(method = "createRope", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;closerThan(Lnet/minecraft/core/Position;D)Z"))
+    @Redirect(method = "createRope", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/phys/Vec3;closerThan(Lnet/minecraft/core/Position;D)Z",
+            remap = true
+    ))
     private boolean createsubmarine$redirectCloserThan(net.minecraft.world.phys.Vec3 instance, net.minecraft.core.Position position, double distance) {
         if (this.createsubmarine$isSteelCable) {
             double maxLength = com.maxenonyme.createsubmarine.submarine.config.SubmarineConfig.STEEL_CABLE_MAX_LENGTH.get();

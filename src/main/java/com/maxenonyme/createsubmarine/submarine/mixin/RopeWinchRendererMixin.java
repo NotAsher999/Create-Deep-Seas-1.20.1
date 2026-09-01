@@ -32,11 +32,9 @@ public class RopeWinchRendererMixin {
         org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci
     ) {
         createsubmarine$isSteelCable = false;
-        if (be instanceof SmartBlockEntity smartBe) {
-            RopeStrandHolderBehavior behavior = smartBe.getBehaviour(RopeStrandHolderBehavior.TYPE);
-            if (behavior instanceof SteelCableHolderAccessor accessor && accessor.createsubmarine$isSteelCable()) {
-                createsubmarine$isSteelCable = true;
-            }
+        RopeStrandHolderBehavior behavior = be.getBehaviour(RopeStrandHolderBehavior.TYPE);
+        if (behavior instanceof SteelCableHolderAccessor accessor && accessor.createsubmarine$isSteelCable()) {
+            createsubmarine$isSteelCable = true;
         }
     }
 

@@ -1,36 +1,32 @@
 package com.maxenonyme.AbyssDimension.network;
 
-import com.maxenonyme.AbyssDimension.CreateAbyss;
 import com.maxenonyme.AbyssDimension.entities.CookiecutterSharkEntity;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
-public record StruggleSharkPayload(int sharkId) implements CustomPacketPayload {
-    public static final Type<StruggleSharkPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CreateAbyss.MOD_ID, "struggle_shark"));
+import java.util.function.Supplier;
 
-    public static final StreamCodec<FriendlyByteBuf, StruggleSharkPayload> CODEC = StreamCodec.of(
-        (buf, payload) -> buf.writeVarInt(payload.sharkId()),
-        buf -> new StruggleSharkPayload(buf.readVarInt())
-    );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+public record StruggleSharkPayload(int sharkId) {
+    public static void encode(StruggleSharkPayload payload, FriendlyByteBuf buf) {
+        buf.writeVarInt(payload.sharkId());
     }
 
-    public static void handle(final StruggleSharkPayload payload, final IPayloadContext context) {
+    public static StruggleSharkPayload decode(FriendlyByteBuf buf) {
+        return new StruggleSharkPayload(buf.readVarInt());
+    }
+
+    public static void handle(StruggleSharkPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            Player player = context.player();
+            ServerPlayer player = context.getSender();
             if (player == null) return;
             Entity entity = player.level().getEntity(payload.sharkId());
             if (entity instanceof CookiecutterSharkEntity shark && shark.isLatchedTo(player)) {
                 shark.addStruggle();
             }
         });
+        context.setPacketHandled(true);
     }
 }

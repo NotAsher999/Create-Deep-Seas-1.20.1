@@ -359,27 +359,27 @@ public class PulleyBlockEntity extends BlockEntity implements BlockEntitySubLeve
     }
 
     @Override
-    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+    public net.minecraft.nbt.CompoundTag getUpdateTag() {
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-        saveAdditional(tag, registries);
+        saveAdditional(tag);
         return tag;
     }
 
     @Override
-    public void onDataPacket(net.minecraft.network.Connection net, net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt, net.minecraft.core.HolderLookup.Provider registries) {
+    public void onDataPacket(net.minecraft.network.Connection net, net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket pkt) {
         net.minecraft.nbt.CompoundTag tag = pkt.getTag();
-        if (tag != null) loadAdditional(tag, registries);
+        if (tag != null) load(tag);
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(net.minecraft.nbt.CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("StressTicks", this.stressTicks);
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.nbt.CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(net.minecraft.nbt.CompoundTag tag) {
+        super.load(tag);
         this.stressTicks = tag.getInt("StressTicks");
     }
 
@@ -412,7 +412,7 @@ public class PulleyBlockEntity extends BlockEntity implements BlockEntitySubLeve
             return new Vector3d(a);
         }
         double t = ap.dot(ab) / abLenSq;
-        t = Math.clamp(t, 0.0, 1.0);
+        t = net.minecraft.util.Mth.clamp(t, 0.0, 1.0);
         return new Vector3d(a).add(ab.mul(t));
     }
 
@@ -458,5 +458,10 @@ public class PulleyBlockEntity extends BlockEntity implements BlockEntitySubLeve
         net.minecraft.core.Direction wheelDir = facing.getAxis().isHorizontal() ? facing.getClockWise() : net.minecraft.core.Direction.EAST;
         return new Vector3d(be.getBlockPos().getX() + 0.5, be.getBlockPos().getY() + 0.75, be.getBlockPos().getZ() + 0.5)
             .add(wheelDir.getStepX() * 0.95, wheelDir.getStepY() * 0.95, wheelDir.getStepZ() * 0.95);
+    }
+
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        return new net.minecraft.world.phys.AABB(getBlockPos()).inflate(1.0);
     }
 }

@@ -1,7 +1,6 @@
 package com.maxenonyme.createsubmarine.submarine.block;
 import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.block.entity.PulleyBlockEntity;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -19,13 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class PulleyBlock extends DirectionalBlock implements EntityBlock {
-    public static final MapCodec<PulleyBlock> CODEC = simpleCodec(PulleyBlock::new);
     public static final BooleanProperty CONNECTED = BooleanProperty.create("connected");
-
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        return CODEC;
-    }
 
     public PulleyBlock(Properties properties) {
         super(properties);

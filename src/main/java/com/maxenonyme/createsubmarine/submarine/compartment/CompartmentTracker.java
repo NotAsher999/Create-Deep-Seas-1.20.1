@@ -108,14 +108,14 @@ public class CompartmentTracker {
         SEALED_UNION.put(id, Collections.unmodifiableSet(sealed));
         VISUAL_UNION.put(id, Collections.unmodifiableSet(visual));
         rebuildSealedSnapshot();
-        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
             com.maxenonyme.createsubmarine.submarine.client.renderer.SubmarineWaterCullBuffer.updateSubmarineOcclusion(id, visual);
         }
         return visual;
     }
 
     public static void remove(UUID id) {
-        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
             com.maxenonyme.createsubmarine.submarine.client.renderer.SubmarineWaterCullBuffer.updateSubmarineOcclusion(id, null);
             com.maxenonyme.createsubmarine.submarine.client.renderer.SubmarineWaterCullBuffer.clearSodiumPoseCache(id);
         }
@@ -427,7 +427,7 @@ public class CompartmentTracker {
             return Fluids.EMPTY.defaultFluidState();
         net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
                 pos.getX() >> 4, pos.getZ() >> 4,
-                net.minecraft.world.level.chunk.status.ChunkStatus.FULL, false);
+                net.minecraft.world.level.chunk.ChunkStatus.FULL, false);
         if (chunk == null)
             return Fluids.EMPTY.defaultFluidState();
         return realFluidState(chunk, pos);

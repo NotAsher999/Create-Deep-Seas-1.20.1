@@ -10,7 +10,6 @@ import com.simibubi.create.api.equipment.goggles.IHaveHoveringInformation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import java.util.List;
 import java.util.UUID;
@@ -130,23 +129,23 @@ public class BarometerBlockEntity extends BlockEntity implements IHaveHoveringIn
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("SyncedDepth", this.syncedDepth);
         tag.putInt("SyncedWeakest", this.syncedWeakest);
         if (this.customName != null) {
-            tag.putString("CustomName", Component.Serializer.toJson(this.customName, registries));
+            tag.putString("CustomName", Component.Serializer.toJson(this.customName));
         }
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("SyncedDepth")) this.syncedDepth = tag.getInt("SyncedDepth");
         if (tag.contains("SyncedWeakest")) this.syncedWeakest = tag.getInt("SyncedWeakest");
         if (tag.contains("CustomName", 8)) {
             try {
-                this.customName = Component.Serializer.fromJson(tag.getString("CustomName"), registries);
+                this.customName = Component.Serializer.fromJson(tag.getString("CustomName"));
                 if (this.pufferfish != null) {
                     this.pufferfish.setCustomName(this.customName);
                     this.pufferfish.setCustomNameVisible(true);
@@ -156,9 +155,9 @@ public class BarometerBlockEntity extends BlockEntity implements IHaveHoveringIn
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        saveAdditional(tag, registries);
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
+        saveAdditional(tag);
         return tag;
     }
 

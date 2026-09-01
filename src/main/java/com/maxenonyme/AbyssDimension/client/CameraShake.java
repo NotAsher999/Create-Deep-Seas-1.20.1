@@ -2,9 +2,9 @@ package com.maxenonyme.AbyssDimension.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 
 public class CameraShake {
     private static float shakeIntensity = 0.0f;
@@ -32,7 +32,8 @@ public class CameraShake {
 
     public static class GameEvents {
         @SubscribeEvent
-        public static void onClientTick(ClientTickEvent.Post event) {
+        public static void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.END) return;
             CameraShake.tick();
         }
 

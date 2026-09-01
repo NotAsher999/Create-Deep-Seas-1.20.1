@@ -35,8 +35,9 @@ public class FloaterBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hitResult) {
+        ItemStack stack = player.getItemInHand(hand);
         if (stack.getItem() instanceof DyeItem dye) {
             DyeColor color = dye.getDyeColor();
             if (state.getValue(COLOR) != color) {
@@ -67,18 +68,22 @@ public class FloaterBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, net.minecraft.world.level.LevelReader level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
+        return createColoredStack(state);
+    }
+
+    private ItemStack createColoredStack(BlockState state) {
         ItemStack stack = new ItemStack(this);
         DyeColor color = state.getValue(COLOR);
-        stack.set(net.minecraft.core.component.DataComponents.BLOCK_STATE, net.minecraft.world.item.component.BlockItemStateProperties.EMPTY.with(COLOR, color));
-        stack.set(net.minecraft.core.component.DataComponents.CUSTOM_MODEL_DATA, new net.minecraft.world.item.component.CustomModelData(getColorIndex(color)));
+        stack.getOrCreateTagElement("BlockStateTag").putString(COLOR.getName(), color.getName());
+        stack.getOrCreateTag().putInt("CustomModelData", getColorIndex(color));
         return stack;
     }
 
     @Override
     public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
         java.util.List<ItemStack> drops = new java.util.ArrayList<>();
-        drops.add(getCloneItemStack(state, null, null, null, null));
+        drops.add(createColoredStack(state));
         return drops;
     }
 

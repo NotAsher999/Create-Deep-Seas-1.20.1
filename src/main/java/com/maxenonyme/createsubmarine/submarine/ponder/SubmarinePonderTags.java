@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class SubmarinePonderTags {
 
-    public static final ResourceLocation DEEP_SEAS = ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "deep_seas");
+    public static final ResourceLocation DEEP_SEAS = new ResourceLocation(CreateSubmarine.MOD_ID, "deep_seas");
 
     public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
         helper.registerTag(DEEP_SEAS)
@@ -17,12 +17,12 @@ public class SubmarinePonderTags {
               .register();
 
         helper.addToTag(DEEP_SEAS)
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "ballast_vent"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "oxygene_diffuser"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "electrolyzer"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "water_thruster"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "barometer"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "steel_cable"))
-              .add(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "pulley"));
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "ballast_vent"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "oxygene_diffuser"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "electrolyzer"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "water_thruster"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "barometer"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "steel_cable"))
+              .add(new ResourceLocation(CreateSubmarine.MOD_ID, "pulley"));
     }
 }

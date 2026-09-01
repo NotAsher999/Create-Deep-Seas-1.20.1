@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
 @Mixin(value = VanillaChunkedSubLevelRenderData.class, remap = false)
@@ -34,7 +34,7 @@ public abstract class SableSubLevelPocketFogMixin {
 
     @Inject(method = "renderChunkedSubLevel", at = @At("HEAD"), remap = false, require = 0)
     private void createsubmarine$defogBegin(RenderType layer, ShaderInstance shader, Matrix4f modelView,
-            double camX, double camY, double camZ, CallbackInfo ci) {
+            double camX, double camY, double camZ, CallbackInfoReturnable<Integer> cir) {
         if (this.subLevel.getLevel() != null) {
             com.maxenonyme.createsubmarine.submarine.client.renderer.SubLevelRenderPoseCapture.capture(
                     this.subLevel.getUniqueId(), this.subLevel.renderPose());
@@ -69,7 +69,7 @@ public abstract class SableSubLevelPocketFogMixin {
 
     @Inject(method = "renderChunkedSubLevel", at = @At("TAIL"), remap = false, require = 0)
     private void createsubmarine$defogEnd(RenderType layer, ShaderInstance shader, Matrix4f modelView,
-            double camX, double camY, double camZ, CallbackInfo ci) {
+            double camX, double camY, double camZ, CallbackInfoReturnable<Integer> cir) {
         if (createsubmarine$savedFogColor == null) return;
         shader.FOG_COLOR.set(createsubmarine$savedFogColor[0], createsubmarine$savedFogColor[1],
                 createsubmarine$savedFogColor[2], createsubmarine$savedFogColor[3]);

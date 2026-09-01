@@ -18,26 +18,26 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class SubmarinePonderScenes {
 
         public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "ballast_vent"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "ballast_vent"))
                                 .addStoryBoard("ballast_vent", SubmarinePonderScenes::ballastVent);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "oxygene_diffuser"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "oxygene_diffuser"))
                                 .addStoryBoard("oxygen_diffuser", SubmarinePonderScenes::oxygeneDiffuser);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "electrolyzer"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "electrolyzer"))
                                 .addStoryBoard("electrolyzer", SubmarinePonderScenes::electrolyzer);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "water_thruster"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "water_thruster"))
                                 .addStoryBoard("water_thruster", SubmarinePonderScenes::waterThruster);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "pulley"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "pulley"))
                                 .addStoryBoard("steel_cable", SubmarinePonderScenes::pulley);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "steel_cable"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "steel_cable"))
                                 .addStoryBoard("steel_cable", SubmarinePonderScenes::steelCable)
                                 .addStoryBoard("steel_cable", SubmarinePonderScenes::steelCableElectrified);
 
-                helper.forComponents(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "barometer"))
+                helper.forComponents(new ResourceLocation(CreateSubmarine.MOD_ID, "barometer"))
                                 .addStoryBoard("barometre1", SubmarinePonderScenes::barometer)
                                 .addStoryBoard("barometre2", SubmarinePonderScenes::barometerDisplayLink);
         }
@@ -143,9 +143,9 @@ public class SubmarinePonderScenes {
                 scene.world().modifyBlockEntity(util.grid().at(3, 1, 4),
                                 com.simibubi.create.content.fluids.tank.FluidTankBlockEntity.class, be -> {
                                         be.getTankInventory().fill(
-                                                        new net.neoforged.neoforge.fluids.FluidStack(
+                                                        new net.minecraftforge.fluids.FluidStack(
                                                                         CreateSubmarine.OXYGEN.get(), 16000),
-                                                        net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                                        net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                                 });
 
                 scene.idle(15);
@@ -222,10 +222,10 @@ public class SubmarinePonderScenes {
                 scene.world().modifyBlockEntity(util.grid().at(1, 1, 4),
                                 com.simibubi.create.content.fluids.tank.FluidTankBlockEntity.class, be -> {
                                         be.getTankInventory()
-                                                        .fill(new net.neoforged.neoforge.fluids.FluidStack(
+                                                        .fill(new net.minecraftforge.fluids.FluidStack(
                                                                         net.minecraft.world.level.material.Fluids.WATER,
                                                                         16000),
-                                                                        net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                                                        net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                                 });
 
                 scene.idle(10);
@@ -260,7 +260,7 @@ public class SubmarinePonderScenes {
                 scene.world().modifyBlockEntity(util.grid().at(7, 1, 4),
                                 com.simibubi.create.content.fluids.tank.FluidTankBlockEntity.class, be -> {
                                         be.getTankInventory().drain(16000,
-                                                        net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                                        net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                                 });
                 scene.idle(15);
 
@@ -304,16 +304,16 @@ public class SubmarinePonderScenes {
                         scene.world().modifyBlockEntity(util.grid().at(1, 1, 4),
                                         com.simibubi.create.content.fluids.tank.FluidTankBlockEntity.class, be -> {
                                                 be.getTankInventory().drain(200,
-                                                                net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                                                net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                                         });
                         scene.world().modifyBlockEntity(util.grid().at(7, 1, 4),
                                         com.simibubi.create.content.fluids.tank.FluidTankBlockEntity.class, be -> {
                                                 be.getTankInventory()
-                                                                .fill(new net.neoforged.neoforge.fluids.FluidStack(
+                                                                .fill(new net.minecraftforge.fluids.FluidStack(
                                                                                 com.maxenonyme.createsubmarine.CreateSubmarine.OXYGEN
                                                                                                 .get(),
                                                                                 200),
-                                                                                net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                                                                net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
                                         });
                         scene.idle(2);
                 }

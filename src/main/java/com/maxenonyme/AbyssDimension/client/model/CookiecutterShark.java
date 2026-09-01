@@ -14,7 +14,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.resources.ResourceLocation;
 
 public class CookiecutterShark<T extends CookiecutterSharkEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(CreateAbyss.MOD_ID, "cookiecutter_shark"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(CreateAbyss.MOD_ID, "cookiecutter_shark"), "main");
     private final ModelPart root;
 
     public CookiecutterShark(ModelPart root) {

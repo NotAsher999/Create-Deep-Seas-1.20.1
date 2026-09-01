@@ -1,0 +1,25 @@
+name: Source checkpoint checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check committed diff formatting
+        run: git diff-tree --check --no-commit-id -r -m --root HEAD
+      - name: Verify Gradle wrapper starts on Java 17
+        run: ./gradlew --version --no-daemon
+      - name: Explain the formal build boundary
+        run: |
+          echo 'The full Forge build requires five ignored SHA-256-locked local inputs.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Use the local release script or release minimal-workspace; see docs/RELEASE.md.' >> "$GITHUB_STEP_SUMMARY"

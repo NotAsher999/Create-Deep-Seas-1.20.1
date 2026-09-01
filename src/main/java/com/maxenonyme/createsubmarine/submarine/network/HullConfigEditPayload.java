@@ -1,72 +1,58 @@
 package com.maxenonyme.createsubmarine.submarine.network;
 
-import com.maxenonyme.createsubmarine.CreateSubmarine;
 import com.maxenonyme.createsubmarine.submarine.config.HullStrengthConfig;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
-public record HullConfigEditPayload(Map<String, HullStrengthConfig.HullProperty> changed) implements CustomPacketPayload {
-    public static final Type<HullConfigEditPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CreateSubmarine.MOD_ID, "hull_config_edit"));
-
-    public static final StreamCodec<FriendlyByteBuf, HullConfigEditPayload> CODEC = StreamCodec.of(
-        HullConfigEditPayload::write,
-        HullConfigEditPayload::read
-    );
-
-    private static void write(FriendlyByteBuf buf, HullConfigEditPayload payload) {
+public record HullConfigEditPayload(Map<String, HullStrengthConfig.HullProperty> changed) {
+    public static void encode(HullConfigEditPayload payload, FriendlyByteBuf buf) {
         buf.writeVarInt(payload.changed.size());
-        for (Map.Entry<String, HullStrengthConfig.HullProperty> e : payload.changed.entrySet()) {
-            buf.writeUtf(e.getKey());
-            buf.writeVarInt(e.getValue().maxWaterDepth());
-            buf.writeFloat(e.getValue().implosionChance());
+        for (Map.Entry<String, HullStrengthConfig.HullProperty> entry : payload.changed.entrySet()) {
+            buf.writeUtf(entry.getKey());
+            buf.writeVarInt(entry.getValue().maxWaterDepth());
+            buf.writeFloat(entry.getValue().implosionChance());
         }
     }
 
-    private static HullConfigEditPayload read(FriendlyByteBuf buf) {
-        int size = Math.max(0, Math.min(buf.readVarInt(), 10000));
+    public static HullConfigEditPayload decode(FriendlyByteBuf buf) {
+        int size = Math.max(0, Math.min(buf.readVarInt(), 10_000));
         Map<String, HullStrengthConfig.HullProperty> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
-            String key = buf.readUtf(256);
-            int depth = buf.readVarInt();
-            float chance = buf.readFloat();
-            map.put(key, new HullStrengthConfig.HullProperty(depth, chance));
+            map.put(buf.readUtf(256), new HullStrengthConfig.HullProperty(buf.readVarInt(), buf.readFloat()));
         }
         return new HullConfigEditPayload(map);
     }
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
-    public static void handle(final HullConfigEditPayload payload, final IPayloadContext context) {
+    public static void handle(HullConfigEditPayload payload, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            if (!(context.player() instanceof ServerPlayer player)) return;
+            ServerPlayer player = context.getSender();
+            if (player == null) return;
             if (!player.hasPermissions(2) && !player.server.isSingleplayerOwner(player.getGameProfile())) return;
-
-            payload.changed().forEach((key, prop) -> {
+            payload.changed().forEach((key, property) -> {
                 if (key == null || key.isEmpty()) return;
-                try { net.minecraft.resources.ResourceLocation.parse(key); }
-                catch (net.minecraft.ResourceLocationException ex) { return; }
-                float chance = prop.implosionChance();
+                try {
+                    new ResourceLocation(key);
+                } catch (ResourceLocationException exception) {
+                    return;
+                }
+                float chance = property.implosionChance();
                 if (!Float.isFinite(chance)) return;
-                int depth = Math.max(0, Math.min(prop.maxWaterDepth(), 100000));
-                HullStrengthConfig.update(key, depth, chance);
+                HullStrengthConfig.update(key, Math.max(0, Math.min(property.maxWaterDepth(), 100_000)), chance);
             });
             HullStrengthConfig.save();
-
             HullConfigSyncPayload sync = new HullConfigSyncPayload(HullStrengthConfig.getValues());
-            for (ServerPlayer p : player.server.getPlayerList().getPlayers()) {
-                PacketDistributor.sendToPlayer(p, sync);
+            for (ServerPlayer target : player.server.getPlayerList().getPlayers()) {
+                SubmarineNetwork.sendToPlayer(target, sync);
             }
         });
+        context.setPacketHandled(true);
     }
 }

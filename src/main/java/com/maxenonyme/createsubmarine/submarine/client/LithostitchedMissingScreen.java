@@ -8,8 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.Util;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.client.event.ScreenEvent;
 import com.maxenonyme.createsubmarine.submarine.config.SubmarineConfig;
 
 import java.util.List;

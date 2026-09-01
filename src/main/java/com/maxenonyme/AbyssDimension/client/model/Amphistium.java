@@ -14,7 +14,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.resources.ResourceLocation;
 
 public class Amphistium<T extends AmphistiumEntity> extends HierarchicalModel<T> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(CreateAbyss.MOD_ID, "amphistium"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(CreateAbyss.MOD_ID, "amphistium"), "main");
     private final ModelPart root;
     private final ModelPart anglerfish;
     private final ModelPart body;

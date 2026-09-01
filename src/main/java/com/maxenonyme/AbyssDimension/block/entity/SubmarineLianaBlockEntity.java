@@ -20,7 +20,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
 import dev.ryanhcode.sable.api.physics.constraint.PhysicsConstraintHandle;
-import dev.ryanhcode.sable.api.physics.constraint.generic.GenericConstraintConfiguration;
+import dev.ryanhcode.sable.api.physics.constraint.GenericConstraintConfiguration;
 import java.util.EnumSet;
 import java.util.UUID;
 
@@ -184,7 +184,7 @@ public class SubmarineLianaBlockEntity extends BlockEntity implements BlockEntit
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public CompoundTag getUpdateTag() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("WorldLight", worldLightLevel);
         return tag;
@@ -492,14 +492,14 @@ public class SubmarineLianaBlockEntity extends BlockEntity implements BlockEntit
 
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.putInt("WorldLight", worldLightLevel);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         if (tag.contains("WorldLight"))
             worldLightLevel = tag.getInt("WorldLight");
     }

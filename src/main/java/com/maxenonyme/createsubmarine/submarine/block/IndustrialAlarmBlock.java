@@ -122,13 +122,9 @@ public class IndustrialAlarmBlock extends DirectionalBlock implements SimpleWate
 
     @SuppressWarnings("null")
     @Override
-    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction facing = state.getValue(BlockStateProperties.FACING);
         return Block.canSupportCenter(level, pos.relative(facing.getOpposite()), facing.getOpposite());
     }
 
-    @Override
-    protected MapCodec<? extends DirectionalBlock> codec() {
-        throw new UnsupportedOperationException();
-    }
 }

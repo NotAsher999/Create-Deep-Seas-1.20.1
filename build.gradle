@@ -1,172 +1,353 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id 'maven-publish'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.107'
     id 'idea'
 }
 
-tasks.named('wrapper', Wrapper).configure {
-    distributionType = Wrapper.DistributionType.BIN
-}
-
-version = mod_version
 group = mod_group_id
+version = mod_version
 
-sourceSets.main.resources {
-    srcDir('src/generated/resources')
-    exclude("**/*.bbmodel")
-    exclude("src/generated/**/.cache")
-}
-
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-    maven {
-        url = uri("https://www.cursemaven.com")
-        content {
-            includeGroup("curse.maven")
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                url = "https://maven.ryanhcode.dev/releases"
-                name = "RyanHCode Maven"
-            }
-        }
-        filter {
-            includeGroup("dev.ryanhcode.sable")
-            includeGroup("dev.ryanhcode.sable-companion")
-        }
-    }
-    maven {
-        url = "https://maven.tterrag.com/"
-    }
-    maven {
-        url = "https://maven.createmod.net/"
-    }
-    maven {
-        url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup("maven.modrinth")
-        }
-    }
-    maven {
-        url = "https://maven.blamejared.com/"
-    }
-}
+def includeCopycatsRuntime = providers.gradleProperty('includeCopycatsRuntime')
+        .map { it.toBoolean() }.getOrElse(false)
+def includeEmbeddiumRuntime = providers.gradleProperty('includeEmbeddiumRuntime')
+        .map { it.toBoolean() }.getOrElse(false)
+def includeOculusRuntime = providers.gradleProperty('includeOculusRuntime')
+        .map { it.toBoolean() }.getOrElse(false)
 
 base {
-    archivesName = mod_id
+    archivesName = "create-deep-seas-forge-${minecraft_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    withSourcesJar()
+}
 
-neoForge {
-    version = project.neo_version
+sourceSets.main.resources {
+    srcDirs = ['src/main/resources', 'src/main/templates', 'src/generated/resources']
+    exclude '**/*.bbmodel'
+    exclude 'src/generated/**/.cache'
+}
 
+sourceSets.test {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
     parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
     }
 
-    runs {
-        client {
-            client()
-            jvmArgument '-Xmx25G'
-            systemProperty 'neoforge.enabledGameTestNamespaces', "${project.mod_id},${project.abyss_mod_id},${project.high_seas_mod_id}"
-        }
-
-        server {
-            server()
-            programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', "${project.mod_id},${project.abyss_mod_id},${project.high_seas_mod_id}"
-        }
-
-        data {
-            data()
-            programArguments.addAll '--mod', "${project.mod_id},${project.abyss_mod_id}", '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-
-        configureEach {
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            logLevel = org.slf4j.event.Level.DEBUG
-        }
+    mixin {
+        add sourceSets.main, 'createdeepseas.refmap.json'
+        config 'create_submarine.mixins.json'
+        config 'create_abyss.mixins.json'
     }
 
     mods {
-        "${mod_id}" {
-            sourceSet(sourceSets.main)
+        create_submarine { sourceSet(sourceSets.main) }
+        create_abyss { sourceSet(sourceSets.main) }
+        create_high_seas { sourceSet(sourceSets.main) }
+    }
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.console.level', 'info'
         }
+        client {
+            client()
+            gameDirectory = project.file('run/client')
+            systemProperty 'veil.disableImgui', 'true'
+        }
+        server {
+            server()
+            gameDirectory = project.file('run/server')
+            programArgument('--nogui')
+        }
+        compatClient {
+            client()
+            gameDirectory = project.file('run/compat-client')
+            systemProperty 'veil.disableImgui', 'true'
+        }
+        compatServer {
+            server()
+            gameDirectory = project.file('run/compat-server')
+            programArgument('--nogui')
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            gameDirectory = project.file('run/gametest')
+            systemProperty 'forge.enabledGameTestNamespaces',
+                    "${mod_id},${abyss_mod_id},${high_seas_mod_id}"
+        }
+        data {
+            data()
+            gameDirectory = project.file('run/data')
+            programArguments.addAll '--mod', "${mod_id},${abyss_mod_id}", '--all',
+                    '--output', file('src/generated/resources/').absolutePath,
+                    '--existing', file('src/main/resources/').absolutePath
+        }
+    }
+}
+
+repositories {
+    flatDir { dirs 'localDeps' }
+    mavenCentral()
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://maven.createmod.net' }
+    maven { url = 'https://maven.ithundxr.dev/mirror' }
+    maven { url = 'https://maven.ryanhcode.dev/releases' }
+    maven { url = 'https://maven.firstdark.dev/snapshots' }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven {
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+        content { includeGroup 'thedarkcolour' }
     }
 }
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    copycatsContract
+    embeddiumContract
+}
+
+legacyForge.runs.configureEach {
+    additionalRuntimeClasspathConfiguration.extendsFrom(configurations.localRuntime)
 }
 
 dependencies {
-    implementation "curse.maven:create-328085:${create_file_id}"
-    implementation "net.createmod.ponder:ponder-neoforge:1.0.82+mc1.21.1"
-    implementation "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:1.0.6"
-    implementation "foundry.veil:veil-neoforge-1.21.1:3.6.2"
-    compileOnly(name: 'aeronautics-neoforge-1.21.1-1.1.3')
-    localRuntime "maven.modrinth:create-aeronautics:1sv6OtSz"
-    compileOnly(name: 'simulated-neoforge-1.21.1-1.1.3')
-    compileOnly "maven.modrinth:sable:1.2.2+mc1.21.1"
-    compileOnly "maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge"
+    // Named development artifacts from the formal read-only dependency ports.
+    // Real game instances must use their production distributions.
+    modImplementation(name: "sable-forge-${minecraft_version}-${sable_version}-dev", ext: 'jar')
+    modImplementation(name: "simulated-forge-${minecraft_version}-${simulated_version}-dev", ext: 'jar')
+    modImplementation(name: "aeronautics-forge-${minecraft_version}-${aeronautics_version}-dev", ext: 'jar')
+    modImplementation(name: "Veil-forge-${minecraft_version}-${veil_version}-dev", ext: 'jar')
 
-    jarJar(api("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:[${sable_companion_version},)")) {
-        version {
-            prefer project.sable_companion_version
-        }
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") {
+        transitive = false
     }
-    localRuntime "maven.modrinth:lithostitched:1.4.8-neoforge-1.21"
-    implementation files("libs/sable-neoforge-1.21.1-1.2.2.jar")
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modRuntimeOnly("thedarkcolour:kotlinforforge:${kotlinforforge_version}")
 
-    localRuntime "maven.modrinth:fusion-connected-textures:1.2.12-neoforge-mc1.21.1"
-}
-
-var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
-    var replaceProperties = [
-        minecraft_version      : minecraft_version,
-        minecraft_version_range: minecraft_version_range,
-        neo_version            : neo_version,
-        neo_version_range      : neo_version_range,
-        loader_version_range   : loader_version_range,
-        sable_version_range    : sable_version_range,
-        mod_id                 : mod_id,
-        mod_name               : mod_name,
-        mod_license            : mod_license,
-        mod_version            : mod_version,
-        abyss_mod_id           : abyss_mod_id,
-        abyss_mod_name         : abyss_mod_name,
-        abyss_mod_version      : abyss_mod_version,
-        high_seas_mod_id       : high_seas_mod_id,
-        high_seas_mod_name     : high_seas_mod_name,
-        high_seas_mod_version  : high_seas_mod_version,
-    ]
-    inputs.properties replaceProperties
-    expand replaceProperties
-    from "src/main/templates"
-    into "build/generated/sources/modMetadata"
-
-    doLast {
-        def buildTimeFile = file("build/generated/sources/modMetadata/build_time.txt")
-        buildTimeFile.text = String.valueOf(System.currentTimeMillis())
+    modCompileOnly("maven.modrinth:copycats:${copycats_version}") { transitive = false }
+    copycatsContract("maven.modrinth:copycats:${copycats_version}") { transitive = false }
+    if (includeCopycatsRuntime) {
+        modRuntimeOnly("maven.modrinth:copycats:${copycats_version}") { transitive = false }
     }
-}
 
-sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+    modCompileOnly("maven.modrinth:embeddium:${embeddium_version}") { transitive = false }
+    embeddiumContract("maven.modrinth:embeddium:${embeddium_version}") { transitive = false }
+    if (includeEmbeddiumRuntime) {
+        modRuntimeOnly("maven.modrinth:embeddium:${embeddium_version}") { transitive = false }
+    }
+    if (includeOculusRuntime) {
+        modRuntimeOnly(name: "oculus-mc${minecraft_version}-${oculus_version}", ext: 'jar')
+    }
+
+    // Libraries normally nested inside Veil's full production artifact.
+    runtimeOnly "gg.moonflower:molang-compiler:${molang_compiler_version}"
+    runtimeOnly "io.github.spair:imgui-java-binding:${imgui_version}"
+    runtimeOnly("io.github.spair:imgui-java-lwjgl3:${imgui_version}") {
+        exclude group: 'org.lwjgl'
+        exclude group: 'org.lwjgl.lwjgl'
+    }
+    runtimeOnly "io.github.spair:imgui-java-natives-windows:${imgui_version}"
+    runtimeOnly("org.lwjgl:lwjgl-opencl:${lwjgl_version}") { transitive = false }
+    runtimeOnly("org.lwjgl:lwjgl-shaderc:${lwjgl_version}") { transitive = false }
+    runtimeOnly "org.lwjgl:lwjgl-shaderc:${lwjgl_version}:natives-windows"
+
+    implementation 'org.joml:joml:1.10.5'
+    implementation 'org.joml:joml-primitives:1.10.0'
+    compileOnly 'org.jetbrains:annotations:24.1.0'
+    compileOnly(annotationProcessor('org.spongepowered:mixin:0.8.5:processor'))
+    compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.5.3'))
+
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.release = 17
+    options.compilerArgs.addAll(['-Xmaxerrs', '5000'])
 }
 
-idea {
-    module {
-        downloadSources = true
-        downloadJavadoc = true
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    inputs.files(configurations.copycatsContract)
+    inputs.files(configurations.embeddiumContract)
+    def simulatedDevJar = layout.projectDirectory.file(
+            "localDeps/simulated-forge-${minecraft_version}-${simulated_version}-dev.jar")
+    def sableDevJar = layout.projectDirectory.file(
+            "localDeps/sable-forge-${minecraft_version}-${sable_version}-dev.jar")
+    inputs.file(simulatedDevJar)
+    inputs.file(sableDevJar)
+    doFirst {
+        systemProperty 'createDeepSeas.copycatsJar', configurations.copycatsContract.singleFile.absolutePath
+        systemProperty 'createDeepSeas.embeddiumJar', configurations.embeddiumContract.singleFile.absolutePath
+        systemProperty 'createDeepSeas.simulatedJar', simulatedDevJar.asFile.absolutePath
+        systemProperty 'createDeepSeas.sableJar', sableDevJar.asFile.absolutePath
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+            minecraft_version: minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version,
+            forge_version_range: forge_version_range,
+            forge_loader_version_range: forge_loader_version_range,
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version,
+            mod_authors: mod_authors,
+            mod_description: mod_description,
+            abyss_mod_id: abyss_mod_id,
+            abyss_mod_name: abyss_mod_name,
+            abyss_mod_version: abyss_mod_version,
+            high_seas_mod_id: high_seas_mod_id,
+            high_seas_mod_name: high_seas_mod_name,
+            high_seas_mod_version: high_seas_mod_version,
+            create_version_range: create_version_range,
+            flywheel_version_range: flywheel_version_range,
+            veil_version_range: veil_version_range,
+            sable_version_range: sable_version_range,
+            simulated_version_range: simulated_version_range,
+            aeronautics_version_range: aeronautics_version_range,
+            copycats_version_range: copycats_version_range,
+            embeddium_version_range: embeddium_version_range
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title': mod_id,
+                'Specification-Vendor': mod_authors,
+                'Specification-Version': '1',
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Vendor': mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'MixinConfigs': 'create_submarine.mixins.json,create_abyss.mixins.json'
+        ])
+    }
+}
+
+def productionJar = tasks.named('reobfJar', Jar).flatMap { it.archiveFile }
+
+tasks.register('verifyProductionJar') {
+    dependsOn tasks.named('reobfJar')
+    inputs.file(productionJar)
+    doLast {
+        def archive = new java.util.jar.JarFile(productionJar.get().asFile)
+        try {
+            def configs = archive.manifest?.mainAttributes?.getValue('MixinConfigs')
+            if (configs != 'create_submarine.mixins.json,create_abyss.mixins.json') {
+                throw new GradleException('Production JAR has incorrect MixinConfigs metadata')
+            }
+            def requiredEntries = [
+                    'create_submarine.mixins.json',
+                    'create_abyss.mixins.json',
+                    'createdeepseas.refmap.json',
+                    'META-INF/mods.toml',
+                    'com/maxenonyme/createsubmarine/CreateSubmarine.class',
+                    'com/maxenonyme/AbyssDimension/CreateAbyss.class',
+                    'com/maxenonyme/highseas/CreateHighSeas.class',
+                    'com/maxenonyme/createsubmarine/submarine/mixin/CreateSubmarineMixinPlugin.class',
+                    'data/minecraft/tags/entity_types/aquatic.json',
+                    'assets/create_submarine/pinwheel/shader_modifiers/minecraft/shaders/core/rendertype_translucent.fsh.txt'
+            ]
+            requiredEntries.each { entry ->
+                if (archive.getEntry(entry) == null) {
+                    throw new GradleException("Production JAR is missing ${entry}")
+                }
+            }
+
+            ['create_submarine.mixins.json', 'create_abyss.mixins.json'].each { configEntry ->
+                def config = new groovy.json.JsonSlurper().parse(archive.getInputStream(archive.getEntry(configEntry)))
+                if (config.refmap != 'createdeepseas.refmap.json') {
+                    throw new GradleException("${configEntry} does not bind the production refmap")
+                }
+                def packagePath = config.package.replace('.', '/')
+                ((config.mixins ?: []) + (config.client ?: [])).each { mixin ->
+                    def classEntry = "${packagePath}/${mixin.replace('.', '/')}.class"
+                    if (archive.getEntry(classEntry) == null) {
+                        throw new GradleException("${configEntry} references missing ${classEntry}")
+                    }
+                }
+            }
+
+            def refmap = new groovy.json.JsonSlurper().parse(
+                    archive.getInputStream(archive.getEntry('createdeepseas.refmap.json')))
+            def ropeMappings = refmap.mappings[
+                    'com/maxenonyme/createsubmarine/submarine/mixin/RopeStrandHolderBehaviorMixin']
+            def closerThan = 'Lnet/minecraft/world/phys/Vec3;closerThan' +
+                    '(Lnet/minecraft/core/Position;D)Z'
+            def mappedCloserThan = 'Lnet/minecraft/world/phys/Vec3;m_82509_' +
+                    '(Lnet/minecraft/core/Position;D)Z'
+            if (ropeMappings == null || ropeMappings[closerThan] != mappedCloserThan) {
+                throw new GradleException('Production refmap does not remap the Simulated rope Vec3 call')
+            }
+
+            def entries = java.util.Collections.list(archive.entries())*.name
+            def recipes = entries.findAll { it ==~ /data\/create_submarine\/recipes\/.+\.json/ }
+            if (recipes.size() != 29) {
+                throw new GradleException("Production JAR must contain 29 Deep Seas recipes, found ${recipes.size()}")
+            }
+            def obsoleteDataPath = entries.find { entry ->
+                entry.startsWith('data/create_submarine/recipe/')
+                        || entry.startsWith('data/create_submarine/loot_table/')
+                        || entry.startsWith('data/minecraft/tags/block/')
+            }
+            if (obsoleteDataPath != null) {
+                throw new GradleException("Production JAR contains obsolete 1.21 data path ${obsoleteDataPath}")
+            }
+
+            ['com/maxenonyme/createsubmarine/CreateSubmarine.class',
+             'com/maxenonyme/AbyssDimension/CreateAbyss.class',
+             'com/maxenonyme/highseas/CreateHighSeas.class'].each { classEntry ->
+                byte[] header = archive.getInputStream(archive.getEntry(classEntry)).readNBytes(8)
+                int major = ((header[6] & 0xff) << 8) | (header[7] & 0xff)
+                if (major != 61) {
+                    throw new GradleException("${classEntry} is Java class major ${major}, expected Java 17/61")
+                }
+            }
+        } finally {
+            archive.close()
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('verifyProductionJar')
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact(tasks.named('jar'))
+            artifact(tasks.named('sourcesJar'))
+        }
+    }
+    repositories {
+        maven { url = layout.buildDirectory.dir('repo') }
     }
 }
